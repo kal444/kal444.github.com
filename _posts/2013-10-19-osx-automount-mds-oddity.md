@@ -74,7 +74,7 @@ mds      52 root   16r   DIR  45,10    16384    2 /Volumes/kyle/berunda/media
 
 Then, I tried to add the directory to the privacy section in Spotlight.
 
-![Spotlight privacy](/media/osx-automount-mds-oddity-spotlight-privacy.png)
+![Spotlight privacy]({{site.url}}/media/osx-automount-mds-oddity-spotlight-privacy.png)
 
 This didn't help. Neither did completely disabling `mds` using `mdutil -d /`. I think disabling `mds` using `sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist` would probably work. But I am not willing to give up Spotlight completely yet.
 

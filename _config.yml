@@ -7,7 +7,7 @@ title:            Write More
 description:      My attempt to write more about everything
 disqus_shortname: 
 #Comment out url when working locally to resolve base urls correctly
-#url:              http://www.kylehuang.com
+url:              http://www.kylehuang.com
 
 # Owner/author information
 owner:

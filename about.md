@@ -3,10 +3,10 @@ layout: page
 permalink: /about/
 title: Kyle Huang
 tags: []
-#image:
-#  feature: image.jpg
-#  credit: abcd
-#  creditlink: abcd
+image:
+  feature: top-of-half-dome.jpg
+#  credit: kyle huang
+#  creditlink: http://www.flickr.com/photos/kal444/10164515886/
 #share: true
 ---
 

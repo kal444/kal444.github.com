@@ -55,12 +55,6 @@ HTML and <abbr title="cascading stylesheets">CSS<abbr> are our tools. Mauris a a
 |:--------|:-------:|--------:|
 | cell1   | cell2   | cell3   |
 | cell4   | cell5   | cell6   |
-|----
-| cell1   | cell2   | cell3   |
-| cell4   | cell5   | cell6   |
-|=====
-| Foot1   | Foot2   | Foot3
-{: rules="groups"}
 
 ## Code Snippets
 

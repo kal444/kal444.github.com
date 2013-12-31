@@ -1,4 +1,4 @@
-read <http://pages.github.com/> for more information
-
 ### License
-... to come
+
+Contents of the files in `_posts` and `media` are copyrighted.
+

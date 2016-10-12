@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Automount Oddity in OS X with Spotlight metadata server (mds)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Automount doesn&#39;t seem to work well with spotlight&#39;s metadata server">
+  <meta name="generator" content="Hugo 0.17" />
+  <link href="" rel="alternate" type="application/rss+xml" title="Write More" />
+  <link href="http://kal444.github.io/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://kal444.github.io/css/hc.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  
+    
+    </head>
+    <body>
+<div class="nav-toggle"><i class="fa fa-bars fa-2x"></i> Herring Cove </div>
+      <div id = "wrapper">
+
+
+<div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="http://kal444.github.io/"><p class="navbar-brand">Write More</p></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+					
+					
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+
+       
+       <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+					<img src="" />
+          <li class="sidebar-brand"><a href="http://kal444.github.io/"><h1 class="brand">Write More</h1></a><h3></h3></li>
+          <hr />
+					
+          <hr />
+          <div id="social-wrapper">
+           
+           
+           
+           
+         </div>
+       </ul>
+     </div>
+
+
+
+     <div class="container">
+
+
+  <div id="article">
+   <div class="article-title">Automount Oddity in OS X with Spotlight metadata server (mds)</div>
+   <p class="meta"><small>&nbsp;<i class="fa fa-calendar-o"></i> 2013-10-19</small></p> <hr/>
+   <div class="post">
+     
+
+<p>I bought a macbook air recently. This is my first mac, but I am very familiar with Unix/Linux. This is part of a series of posts on using OS X (Mountain Lion).</p>
+
+<h3 id="a-simple-thing">A Simple Thing</h3>
+
+<p>I have a NAS with a Samba share that I&rsquo;d like to mount on the mac at a <em>fixed location</em> and have it to be usable by my user <em>always</em>. The same share might be mounted by another user on the same mac, but it can be at a different mount point. This simplifies things a bit. The mount point doesn&rsquo;t have to have open permission for all users.</p>
+
+<h3 id="using-finder">Using Finder</h3>
+
+<p>Using Finder, the first attempt is to use <code>Go -&gt; Connect To Server...</code>. This automatically puts the mount as <code>/Volumes/&lt;sharename&gt;</code>. Not so bad if you have only 1 share to deal with. But if multiple users try to mount the same share, you will end up with <code>/Volumes/&lt;sharename&gt;-1</code>, <code>/Volumes/&lt;sharename&gt;-2</code>, etc. Not permanent solution.</p>
+
+<h3 id="using-automount">Using Automount</h3>
+
+<p>Automount in OS X is pretty well documented. See <code>man auto_master</code>. On Linux, this is always a nice way to lazily mount a drive on demand when you visit a mapped directory. I thought this would solve my problem.</p>
+
+<h4 id="etc-auto-master"><code>/etc/auto_master</code></h4>
+
+<pre><code>#
+# Automounter master map
+#
++auto_master          # Use directory service
+/net                  -hosts                -nobrowse,hidefromfinder,nosuid
+/home                 auto_home             -nobrowse,hidefromfinder
+/Network/Servers      -fstab
+/-                    -static
+/Volumes/kyle/berunda auto_mount_berunda
+</code></pre>
+
+<h4 id="etc-auto-mount-berunda"><code>/etc/auto_mount_berunda</code></h4>
+
+<pre><code>media    -fstype=smbfs    smb://downloader:v3rysekret@berunda:/&amp;
+</code></pre>
+
+<p>Run <code>sudo automount -vc</code> and it&rsquo;s good to go.</p>
+
+<p>Now, when I <code>cd</code> into <code>/Volumes/kyle/berunda/media</code>, there is a slight hesitation and the share is mounted.</p>
+
+<pre><code>[~] % mount
+/dev/disk0s2 on / (hfs, local, journaled)
+devfs on /dev (devfs, local, nobrowse)
+map -hosts on /net (autofs, nosuid, automounted, nobrowse)
+map auto_home on /home (autofs, automounted, nobrowse)
+map auto_mount_berunda on /Volumes/kyle/berunda (autofs, automounted, nobrowse)
+//downloader@berunda/media on /Volumes/kyle/berunda/media (smbfs, nodev, nosuid, automounted, nobrowse, mounted by kal)
+
+[~] % ls -ld /Volumes/kyle/berunda/media
+drwx------  1 kal  wheel    16K Oct 14 23:23 /Volumes/kyle/berunda/media/
+</code></pre>
+
+<p>This was good until sometimes later. I noticed that I can&rsquo;t access that directory anymore. Here is why:</p>
+
+<pre><code>[~] % sudo ls -ld /Volumes/kyle/berunda/media
+drwx------  1 root  wheel  16384 Oct 14 23:23 /Volumes/kyle/berunda/media
+
+[~] % mount
+...
+//downloader@berunda/media on /Volumes/kyle/berunda/media (smbfs, nodev, nosuid, automounted, nobrowse)
+</code></pre>
+
+<p>So whenever the mount point is unmounted &ndash; due to inactivity or manual <code>umount</code>, some process owned by <code>root</code> is accessing the location and remounting it under <code>root</code>. Preventing me from access it. I wonder what process could that?</p>
+
+<pre><code>[~] % sudo lsof /Volumes/kyle/berunda/media
+COMMAND PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+mds      52 root   16r   DIR  45,10    16384    2 /Volumes/kyle/berunda/media
+</code></pre>
+
+<p><code>mds</code> is the OS X process used to index your drives and to produce the metadata that Spotlight uses to perform searches. My guess was <code>mds</code> traversed into the directory and automount, of course, mounted the share.</p>
+
+<p>Then, I tried to add the directory to the privacy section in Spotlight.</p>
+
+<p><img src="{{site.url}}/media/osx-automount-mds-oddity-spotlight-privacy.png" alt="Spotlight privacy" /></p>
+
+<p>This didn&rsquo;t help. Neither did completely disabling <code>mds</code> using <code>mdutil -d /</code>. I think disabling <code>mds</code> using <code>sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist</code> would probably work. But I am not willing to give up Spotlight completely yet.</p>
+
+<p>So I need another way. Next time I will look into using <code>launchd</code> and <a href="http://www.bernhard-baehr.de/">SleepWatcher</a></p>
+
+   </div>
+ </div>
+
+
+ <a href="https://twitter.com/share" class="twitter-share-button " data-size="small" data-count="none">Tweet</a>
+ <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+ <ul class="pager">
+      &nbsp;<li class="previous"><a href="http://kal444.github.io/2013/10/24/mount-shares-on-login-wakeup/"> Mount shares on OS X on Login and Wakeup</a></li>
+      &nbsp;<li class="next"><a href="http://kal444.github.io/2013/10/18/testing-post/"> Testing Post</a></li>
+</ul>
+
+
+
+    </ul>
+    </div>
+    <footer>
+
+        <p class="text-muted credit">&copy; 2016. All rights reserved. </p>
+    </footer>
+ 
+    <script src="http://kal444.github.io/js/jquery-1.10.2.min.js"></script>
+    <script src="http://kal444.github.io/js/bootstrap.min.js"></script>
+    <script src="http://kal444.github.io/js/bootstrap.js"></script>
+    <script type="text/javascript" src="http://kal444.github.io/js/hc.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Write More</title>
+    <link>http://kal444.github.io/tags/shares/index.xml</link>
+    <description>Recent content on Write More</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <atom:link href="http://kal444.github.io/tags/shares/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Mount shares on OS X on Login and Wakeup</title>
+      <link>http://kal444.github.io/2013/10/24/mount-shares-on-login-wakeup/</link>
+      <pubDate>Thu, 24 Oct 2013 00:00:00 +0000</pubDate>
+      
+      <guid>http://kal444.github.io/2013/10/24/mount-shares-on-login-wakeup/</guid>
+      <description>
+
+&lt;p&gt;I bought a macbook air recently. This is my first mac, but I am very familiar with Unix/Linux. This is part of a series of posts on using OS X (Mountain Lion).&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;{{site.url}}/osx-automount-mds-oddity/&#34;&gt;Last time&lt;/a&gt;, I wanted to use automount to mount a Samba share at a fixed location. It didn&amp;rsquo;t work as I expected.&lt;/p&gt;
+
+&lt;p&gt;This time around, I am going to go the simple route and use &lt;code&gt;launchd&lt;/code&gt; to mount the share whenever I login.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;launchd &amp;ndash; System wide and per-user daemon/agent manager&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In other words, you can use launchd to launch things. :) It&amp;rsquo;s great!&lt;/p&gt;
+
+&lt;h3 id=&#34;launch-a-script-at-login&#34;&gt;Launch a script at login&lt;/h3&gt;
+
+&lt;p&gt;According to &lt;code&gt;man launchd&lt;/code&gt;, user specific launching instructions are stored in &lt;code&gt;~/Library/LaunchAgents&lt;/code&gt;. It&amp;rsquo;s pretty easy to figure out the syntax just by looking at the examples that&amp;rsquo;s already there. But for the comprehensive explanation on the plist format for &lt;code&gt;launchd&lt;/code&gt;, look at &lt;code&gt;man launchd.plist&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;I ended up with this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;!DOCTYPE plist PUBLIC &amp;quot;-//Apple Computer//DTD PLIST 1.0//EN&amp;quot; &amp;quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;quot;&amp;gt;
+&amp;lt;plist version=&amp;quot;1.0&amp;quot;&amp;gt;
+&amp;lt;dict&amp;gt;
+	&amp;lt;key&amp;gt;Label&amp;lt;/key&amp;gt;
+	&amp;lt;string&amp;gt;com.yellowaxe.berunda-mounts&amp;lt;/string&amp;gt;
+	&amp;lt;key&amp;gt;ProgramArguments&amp;lt;/key&amp;gt;
+	&amp;lt;array&amp;gt;
+		&amp;lt;string&amp;gt;/Users/kal/usr/bin/berunda-mount-shares&amp;lt;/string&amp;gt;
+	&amp;lt;/array&amp;gt;
+	&amp;lt;key&amp;gt;RunAtLoad&amp;lt;/key&amp;gt;
+	&amp;lt;true/&amp;gt;
+&amp;lt;/dict&amp;gt;
+&amp;lt;/plist&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It&amp;rsquo;s important to put in the full path to your script instead of &lt;code&gt;~kal/usr/bin/berunda-mount-shares&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;You can then load this .plist file using &lt;code&gt;launchctl load ~/Library/LaunchAgents/&amp;lt;plist-file-name&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;berunda-mount-shares&#34;&gt;&lt;code&gt;berunda-mount-shares&lt;/code&gt;&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+
+for i in `seq 1 9`; do
+  # wait until interface is active again.
+  # is there a better way to do this?
+  ifconfig en0 | grep -q &#39;status: active&#39; &amp;amp;&amp;amp; break;
+  sleep 5
+done
+
+ping -q -c1 berunda &amp;gt;/dev/null || exit; # server not up
+
+pw=$(security find-internet-password -w -a kal -s berunda)
+
+mount | grep -q /opt/kyle/berunda/media &amp;amp;&amp;amp; exit; # already mounted
+mount -t smbfs smb://kal:$pw@berunda/media /opt/kyle/berunda/media
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The for loop is put in to wait for the network interface to become active. This seems to be needed more for the wakeup step. I added some additional changes for server&amp;rsquo;s status and if the mount is already there.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;security find-internet-password&lt;/code&gt; is a great way to find your password in the OS X keychain. You do have to store the password in the keychain first&amp;hellip; The easiest way is to mount the share in Finder and have it remember your password.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note that the mount command WILL expose your password on the command line (briefly) since it passes the password to &lt;code&gt;mount_smbfs&lt;/code&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;launching-a-script-when-the-laptop-wakes-up&#34;&gt;Launching a script when the laptop wakes up&lt;/h3&gt;
+
+&lt;p&gt;For completeness, I wanted to unmount a share when the computer sleeps and remount it when the computer wakes back up. For this, I turn to: &lt;a href=&#34;http://www.bernhard-baehr.de/&#34;&gt;SleepWatcher&lt;/a&gt;. However, I am not going to install it from the site&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;Thanks to a friend, I was turned onto &lt;a href=&#34;http://brew.sh/&#34;&gt;Homebrew&lt;/a&gt;. It&amp;rsquo;s a simple &lt;code&gt;brew install sleepwatcher&lt;/code&gt; to install this.&lt;/p&gt;
+
+&lt;p&gt;Running SleepWatcher involves our old friend &lt;code&gt;launchd&lt;/code&gt; again. Here is the .plist file to use.&lt;/p&gt;
+
+&lt;h4 id=&#34;de-bernhard-baehr-sleepwatcher-plist&#34;&gt;&lt;code&gt;de.bernhard-baehr.sleepwatcher.plist&lt;/code&gt;&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;!DOCTYPE plist PUBLIC &amp;quot;-//Apple Computer//DTD PLIST 1.0//EN&amp;quot; &amp;quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;quot;&amp;gt;
+&amp;lt;plist version=&amp;quot;1.0&amp;quot;&amp;gt;
+&amp;lt;dict&amp;gt;
+	&amp;lt;key&amp;gt;Label&amp;lt;/key&amp;gt;
+	&amp;lt;string&amp;gt;de.bernhard-baehr.sleepwatcher&amp;lt;/string&amp;gt;
+	&amp;lt;key&amp;gt;ProgramArguments&amp;lt;/key&amp;gt;
+	&amp;lt;array&amp;gt;
+		&amp;lt;string&amp;gt;/usr/local/sbin/sleepwatcher&amp;lt;/string&amp;gt;
+		&amp;lt;string&amp;gt;-V&amp;lt;/string&amp;gt;
+                &amp;lt;string&amp;gt;-s /Users/kal/usr/bin/on-sleep&amp;lt;/string&amp;gt;
+                &amp;lt;string&amp;gt;-w /Users/kal/usr/bin/on-wakeup&amp;lt;/string&amp;gt;
+	&amp;lt;/array&amp;gt;
+	&amp;lt;key&amp;gt;RunAtLoad&amp;lt;/key&amp;gt;
+	&amp;lt;true/&amp;gt;
+	&amp;lt;key&amp;gt;KeepAlive&amp;lt;/key&amp;gt;
+	&amp;lt;true/&amp;gt;
+&amp;lt;/dict&amp;gt;
+&amp;lt;/plist&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;on-wakeup&lt;/code&gt; just simply calls &lt;code&gt;~kal/usr/bin/berunda-mount-shares&lt;/code&gt; and &lt;code&gt;on-sleep&lt;/code&gt; calls &lt;code&gt;~kal/usr/bin/berunda-umount-shares&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;And to finish this out.&lt;/p&gt;
+
+&lt;h4 id=&#34;berunda-umount-shares&#34;&gt;&lt;code&gt;berunda-umount-shares&lt;/code&gt;&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;#!/bin/sh
+
+ping -q -c1 berunda &amp;gt;/dev/null || exit; # server not up
+
+mount | grep -q /opt/kyle/berunda/media || exit; # already unmounted
+umount /opt/kyle/berunda/media
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So far, this has been working great.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

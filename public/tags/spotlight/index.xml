@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Write More</title>
+    <link>http://kal444.github.io/tags/spotlight/index.xml</link>
+    <description>Recent content on Write More</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <atom:link href="http://kal444.github.io/tags/spotlight/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Automount Oddity in OS X with Spotlight metadata server (mds)</title>
+      <link>http://kal444.github.io/2013/10/19/osx-automount-mds-oddity/</link>
+      <pubDate>Sat, 19 Oct 2013 00:00:00 +0000</pubDate>
+      
+      <guid>http://kal444.github.io/2013/10/19/osx-automount-mds-oddity/</guid>
+      <description>
+
+&lt;p&gt;I bought a macbook air recently. This is my first mac, but I am very familiar with Unix/Linux. This is part of a series of posts on using OS X (Mountain Lion).&lt;/p&gt;
+
+&lt;h3 id=&#34;a-simple-thing&#34;&gt;A Simple Thing&lt;/h3&gt;
+
+&lt;p&gt;I have a NAS with a Samba share that I&amp;rsquo;d like to mount on the mac at a &lt;em&gt;fixed location&lt;/em&gt; and have it to be usable by my user &lt;em&gt;always&lt;/em&gt;. The same share might be mounted by another user on the same mac, but it can be at a different mount point. This simplifies things a bit. The mount point doesn&amp;rsquo;t have to have open permission for all users.&lt;/p&gt;
+
+&lt;h3 id=&#34;using-finder&#34;&gt;Using Finder&lt;/h3&gt;
+
+&lt;p&gt;Using Finder, the first attempt is to use &lt;code&gt;Go -&amp;gt; Connect To Server...&lt;/code&gt;. This automatically puts the mount as &lt;code&gt;/Volumes/&amp;lt;sharename&amp;gt;&lt;/code&gt;. Not so bad if you have only 1 share to deal with. But if multiple users try to mount the same share, you will end up with &lt;code&gt;/Volumes/&amp;lt;sharename&amp;gt;-1&lt;/code&gt;, &lt;code&gt;/Volumes/&amp;lt;sharename&amp;gt;-2&lt;/code&gt;, etc. Not permanent solution.&lt;/p&gt;
+
+&lt;h3 id=&#34;using-automount&#34;&gt;Using Automount&lt;/h3&gt;
+
+&lt;p&gt;Automount in OS X is pretty well documented. See &lt;code&gt;man auto_master&lt;/code&gt;. On Linux, this is always a nice way to lazily mount a drive on demand when you visit a mapped directory. I thought this would solve my problem.&lt;/p&gt;
+
+&lt;h4 id=&#34;etc-auto-master&#34;&gt;&lt;code&gt;/etc/auto_master&lt;/code&gt;&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;#
+# Automounter master map
+#
++auto_master          # Use directory service
+/net                  -hosts                -nobrowse,hidefromfinder,nosuid
+/home                 auto_home             -nobrowse,hidefromfinder
+/Network/Servers      -fstab
+/-                    -static
+/Volumes/kyle/berunda auto_mount_berunda
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;etc-auto-mount-berunda&#34;&gt;&lt;code&gt;/etc/auto_mount_berunda&lt;/code&gt;&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;media    -fstype=smbfs    smb://downloader:v3rysekret@berunda:/&amp;amp;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Run &lt;code&gt;sudo automount -vc&lt;/code&gt; and it&amp;rsquo;s good to go.&lt;/p&gt;
+
+&lt;p&gt;Now, when I &lt;code&gt;cd&lt;/code&gt; into &lt;code&gt;/Volumes/kyle/berunda/media&lt;/code&gt;, there is a slight hesitation and the share is mounted.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[~] % mount
+/dev/disk0s2 on / (hfs, local, journaled)
+devfs on /dev (devfs, local, nobrowse)
+map -hosts on /net (autofs, nosuid, automounted, nobrowse)
+map auto_home on /home (autofs, automounted, nobrowse)
+map auto_mount_berunda on /Volumes/kyle/berunda (autofs, automounted, nobrowse)
+//downloader@berunda/media on /Volumes/kyle/berunda/media (smbfs, nodev, nosuid, automounted, nobrowse, mounted by kal)
+
+[~] % ls -ld /Volumes/kyle/berunda/media
+drwx------  1 kal  wheel    16K Oct 14 23:23 /Volumes/kyle/berunda/media/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This was good until sometimes later. I noticed that I can&amp;rsquo;t access that directory anymore. Here is why:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[~] % sudo ls -ld /Volumes/kyle/berunda/media
+drwx------  1 root  wheel  16384 Oct 14 23:23 /Volumes/kyle/berunda/media
+
+[~] % mount
+...
+//downloader@berunda/media on /Volumes/kyle/berunda/media (smbfs, nodev, nosuid, automounted, nobrowse)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So whenever the mount point is unmounted &amp;ndash; due to inactivity or manual &lt;code&gt;umount&lt;/code&gt;, some process owned by &lt;code&gt;root&lt;/code&gt; is accessing the location and remounting it under &lt;code&gt;root&lt;/code&gt;. Preventing me from access it. I wonder what process could that?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[~] % sudo lsof /Volumes/kyle/berunda/media
+COMMAND PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+mds      52 root   16r   DIR  45,10    16384    2 /Volumes/kyle/berunda/media
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;mds&lt;/code&gt; is the OS X process used to index your drives and to produce the metadata that Spotlight uses to perform searches. My guess was &lt;code&gt;mds&lt;/code&gt; traversed into the directory and automount, of course, mounted the share.&lt;/p&gt;
+
+&lt;p&gt;Then, I tried to add the directory to the privacy section in Spotlight.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;{{site.url}}/media/osx-automount-mds-oddity-spotlight-privacy.png&#34; alt=&#34;Spotlight privacy&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This didn&amp;rsquo;t help. Neither did completely disabling &lt;code&gt;mds&lt;/code&gt; using &lt;code&gt;mdutil -d /&lt;/code&gt;. I think disabling &lt;code&gt;mds&lt;/code&gt; using &lt;code&gt;sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist&lt;/code&gt; would probably work. But I am not willing to give up Spotlight completely yet.&lt;/p&gt;
+
+&lt;p&gt;So I need another way. Next time I will look into using &lt;code&gt;launchd&lt;/code&gt; and &lt;a href=&#34;http://www.bernhard-baehr.de/&#34;&gt;SleepWatcher&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

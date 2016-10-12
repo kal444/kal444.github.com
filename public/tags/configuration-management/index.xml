@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Write More</title>
+    <link>http://kal444.github.io/tags/configuration-management/index.xml</link>
+    <description>Recent content on Write More</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <atom:link href="http://kal444.github.io/tags/configuration-management/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Basic configuration for a new server using Puppet and Vagrant</title>
+      <link>http://kal444.github.io/2013/12/29/vagrant-puppet-server-setup/</link>
+      <pubDate>Sun, 29 Dec 2013 00:00:00 +0000</pubDate>
+      
+      <guid>http://kal444.github.io/2013/12/29/vagrant-puppet-server-setup/</guid>
+      <description>
+
+&lt;p&gt;Recently, I read &lt;a href=&#34;http://plusbryan.com/my-first-5-minutes-on-a-server-or-essential-security-for-linux-servers&#34;&gt;My First 5 Minutes On A Server&lt;/a&gt; and &lt;a href=&#34;http://blog.kloudless.com/2013/07/01/automating-development-environments-with-vagrant-and-puppet&#34;&gt;Automating Development Environments with Vagrant and Puppet&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;On the hacker news discussion of the former, someone mentioned maybe what&amp;rsquo;s needed is a starting point with a configuration management tool.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;ve been meaning to find out more &lt;a href=&#34;http://www.vagrantup.com&#34;&gt;Vagrant&lt;/a&gt; and &lt;a href=&#34;http://puppetlabs.com/puppet/puppet-open-source&#34;&gt;Puppet&lt;/a&gt; for a while, so I thought this is a good time to dig in, learn both, and implement the &amp;ldquo;five minutes on a server&amp;rdquo; recommendations in Puppet (with some of my own twists).&lt;/p&gt;
+
+&lt;h3 id=&#34;vagrant&#34;&gt;Vagrant&lt;/h3&gt;
+
+&lt;p&gt;Creating a configuration management script for a new server doesn&amp;rsquo;t actually involve Vagrant. It&amp;rsquo;s included here because it&amp;rsquo;s an awesome tool to manage virtual machines. This gives you a great way to test out your CM scripts without using an actual server. You do test out your CM script changes before you roll it out to a production server, right?&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://www.vagrantup.com/downloads&#34;&gt;Installing Vagrant&lt;/a&gt; is easy. If you are on OS X, I used &lt;a href=&#34;http://brew.sh&#34;&gt;brew&lt;/a&gt; to install Vagrant. Then, you have to install a VM provider. Easiest (i.e. cheapest) one to use is &lt;a href=&#34;https://www.virtualbox.org/wiki/Downloads&#34;&gt;VirtualBox&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Once they are installed, start VirtualBox at least once as there is a configuration for default VM location. Pick a directory to store you Vagrant configurations (it wouldn&amp;rsquo;t be a bad idea to source control this folder too). Then, run &lt;code&gt;vagrant init&lt;/code&gt;. This will create an initial version of the configuration. Your VM fun starts here. After some tweaking, mine ended up looking like this: &lt;a href=&#34;{{site.url}}/media/puppet/Vagrantfile.txt&#34;&gt;Vagrantfile&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let me go through the sections in the file.&lt;/p&gt;
+
+&lt;p&gt;
+  config.vm.box = &#34;puppet-labs-ubuntu-server-12042-x64-vbox4210-nocm.&#34;
+  config.vm.box_url = &#34;http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box&#34;
+
+This pulls down the preconfigured base box from puppetlabs.com. This is the blank slate you start with. I used Ubuntu x64 12.04 LTS &lt;em&gt;aka&lt;/em&gt; Precise Pangolin. You can see more base boxes &lt;a href=&#34;http://puppet-vagrant-boxes.puppetlabs.com&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;http://www.vagrantbox.es&#34;&gt;here&lt;/a&gt;. I also picked the version without any CM software installed. I did this because the reasoning from the &lt;a href=&#34;http://blog.kloudless.com/2013/07/01/automating-development-environments-with-vagrant-and-puppet&#34;&gt;second article&lt;/a&gt; - if you install your own CM software, then you can easily keep it up to date without changing the base box frequently.&lt;/p&gt;
+
+&lt;p&gt;
+  config.vm.define :web do |web|
+    web.vm.hostname = &#34;dev-www.yellowaxe.vm&#34;
+    web.vm.network :private_network, ip: &#34;192.168.33.10&#34;
+    web.vm.network :forwarded_port, guest: 80, host: 9080
+    web.vm.network :forwarded_port, guest: 443, host: 7043
+  end
+
+This section defines a VM and gives it a hostname, IP, and forward some ports. Pretty self-explanatory.&lt;/p&gt;
+
+&lt;p&gt;
+  config.vm.provider :virtualbox do |vb|
+    vb.customize [&#34;modifyvm&#34;, :id, &#34;--memory&#34;, &#34;1024&#34;]
+  end
+
+This section modifies the VM using VirtualBox specific tool. You can do a lot more here. Currently, I just have it increase the memory to 1GB.&lt;/p&gt;
+
+&lt;p&gt;
+  # Enable shell provisioning to bootstrap puppet
+  config.vm.provision :shell, :path =&gt; &#34;puppet-bootstrap.sh&#34;
+
+This defines the first provisioner for the VM. It takes care of installing the latest version of puppet. The script is essentially the same as the one used in the kloudless article. It looks like this: &lt;a href=&#34;{{site.url}}/media/puppet/puppet-bootstrap.sh.txt&#34;&gt;puppet-bootstrap.sh&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;
+  # Enable provisioning with Puppet stand alone.
+  config.vm.provision :puppet do |puppet|
+        puppet.manifests_path = &#34;puppet/manifests&#34;
+        puppet.manifest_file  = &#34;site.pp&#34;
+        puppet.module_path = &#34;puppet/modules&#34;
+        puppet.options = &#34;--verbose&#34;
+        #puppet.options = &#34;--debug --verbose&#34;
+  end
+
+This defines the second provisioner - Puppet. This is the one that gets the work done.&lt;/p&gt;
+
+&lt;h3 id=&#34;puppet&#34;&gt;Puppet&lt;/h3&gt;
+
+&lt;p&gt;Before I jump into the puppet configuration. Here is the directory structure of my puppet files under the Vagrant directory. As you add more puppet modules, there will be more directories.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[~/VMs/Vagrant] % tree puppet/manifests puppet/modules/yellowaxe
+puppet/manifests
+└── site.pp
+puppet/modules/yellowaxe
+├── files
+│   └── kal
+│       └── authorized_keys
+└── templates
+    ├── 00logwatch.erb
+    ├── sshd_config.erb
+    └── sudoers.puppet.erb
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;puppet/manifests&lt;/code&gt; typically stores all your &lt;code&gt;*.pp&lt;/code&gt; puppet files. This are the configuration files written in the puppet language. You can break up the &lt;code&gt;site.pp&lt;/code&gt; files into multiple files, but the puppet way is to create modules.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;puppet/modules&lt;/code&gt; stores your own and any third part modules. You can get an idea on the modules available by browsing around &lt;a href=&#34;http://forge.puppetlabs.com&#34;&gt;the forge&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The one module I listed is what I created to corral my configurations. For simplicity in this article, I kept all puppet code in &lt;code&gt;site.pp&lt;/code&gt;. In a proper module setup, I would move the various class definitions into their rightful places in the modules directory.&lt;/p&gt;
+
+&lt;p&gt;Here is the full &lt;a href=&#34;{{site.url}}/media/puppet/site.pp.txt&#34;&gt;site.pp&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;For each section, I will provide a brief explanation on the puppet syntax.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# create a new stage before the main stage
+stage { &#39;first&#39;: } -&amp;gt; Stage[&#39;main&#39;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;By default, Puppet only runs 1 stage (think of as a grouping of tasks) and it&amp;rsquo;s the main stage. In my configuration, I&amp;rsquo;d like to run certain tasks before the main stage. So, to guarantee that, I created this new stage called &lt;em&gt;first&lt;/em&gt;. The symbol &lt;code&gt;-&amp;gt;&lt;/code&gt; is a chaining operator. It means: The newly created stage do its thing before the main stage.&lt;/p&gt;
+
+&lt;p&gt;Now, everything is added to main stage by default. So I will point where I have to indicate a certain task needs to be added to the &lt;em&gt;first&lt;/em&gt; stage.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::upgrade-all-pacakges {
+  # apt-get update &amp;amp;&amp;amp; apt-get upgrade
+  # start the process with an updated system
+  # this should be run before everything else (main stage)
+  exec { &#39;apt-update&#39;:
+    command =&amp;gt; &#39;/usr/bin/apt-get update&#39;,
+  } -&amp;gt;
+  exec { &#39;apt-upgrade&#39;:
+    command =&amp;gt; &#39;/usr/bin/apt-get -y upgrade&#39;,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;class&lt;/code&gt; here defines a container of puppet resources. This is just a definition (like how a class in C++, Java is a definition). No action is actually done until you &amp;ldquo;instantiate&amp;rdquo; the class later.&lt;/p&gt;
+
+&lt;p&gt;This is the type of things that will go into a module file.&lt;/p&gt;
+
+&lt;p&gt;The class just runs 2 commands, chained together.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::update-motd {
+  file { &#39;/etc/motd&#39;:
+    ensure =&amp;gt; file,
+    content =&amp;gt; &amp;quot;Welcome!&amp;quot;,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I don&amp;rsquo;t like to leak too much information in MOTD, so we keep it simple. This also introduces the &lt;em&gt;file&lt;/em&gt; puppet resource. In this case, it ensures the resource specified (using the path in the title section) is present and is a file type. And, the content of file will be updated if necessary to match the inlined simple string.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::timezone($timezone = &#39;US/Central&#39;) {
+  # configure time zones
+  file { &#39;/etc/localtime&#39;:
+    ensure =&amp;gt; link,
+    target =&amp;gt; &amp;quot;/usr/share/zoneinfo/$timezone&amp;quot;,
+  }
+  file { &#39;/etc/timezone&#39;:
+    content =&amp;gt; &amp;quot;$timezone\n&amp;quot;,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You will want to keep your servers on the same timezone generally. This will do that. I put in a default of US Central timezone, because that&amp;rsquo;s where I am.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::ban-failed-logins {
+  # block failed logins, default seems decent
+  package { &#39;fail2ban&#39;:
+    ensure =&amp;gt; installed,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Make sure the fail2ban package is installed. We will go with the default for now.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::normal-user($username) {
+  # creates normal users, add more defaults here
+  user { &amp;quot;$username&amp;quot;:
+    ensure =&amp;gt; present,
+    managehome =&amp;gt; true,
+    password =&amp;gt; &#39;*&#39;,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This class will create a normal user, and disable password usage. Home directory will be created if needed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::sudo-user($username) {
+  # creates users with sudo access, add more defaults here
+  user { &amp;quot;$username&amp;quot;:
+    ensure =&amp;gt; present,
+    managehome =&amp;gt; true,
+    password =&amp;gt; &#39;*&#39;,
+    groups =&amp;gt; [&#39;sudo&#39;],
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This class will create a user that can &lt;code&gt;sudo&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::users {
+  # disable root password
+  # we don&#39;t want root to be used at all
+  user { &#39;root&#39;:
+    password =&amp;gt; &#39;*&#39;,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Disable root password. While it&amp;rsquo;s an option to just change the root password to a really long and complicated one, there is no reason you ever need to use root if there are multiple sudo-able users. If it is something you must do in the console, there is always single user mode.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::sudo-config {
+  # setup special sudo permissions
+  # this allows a user to sudo without password, for example
+  file { &#39;/etc/sudoers.d/puppet&#39;:
+    ensure =&amp;gt; file,
+    content =&amp;gt; template(&#39;yellowaxe/sudoers.puppet.erb&#39;),
+    owner =&amp;gt; &#39;root&#39;,
+    group =&amp;gt; &#39;root&#39;,
+    mode =&amp;gt; &#39;0440&#39;,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In addition to &lt;code&gt;/etc/sudoers&lt;/code&gt;, additional sudo configuration is included from &lt;code&gt;/etc/sudoers.d&lt;/code&gt; directory. Here, we add an additional sudoer configuration. This can be tailored specifically to fit your needs.&lt;/p&gt;
+
+&lt;p&gt;This uses Puppet&amp;rsquo;s &lt;code&gt;template&lt;/code&gt; function to fill out an ERB template file. You can learn more about it &lt;a href=&#34;http://docs.puppetlabs.com/guides/templating.html&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::push-pubic-keys($username) {
+  # push public keys for a given user
+  file { &amp;quot;/home/$username/.ssh&amp;quot;:
+    ensure =&amp;gt; directory,
+    owner =&amp;gt; &amp;quot;$username&amp;quot;,
+    group =&amp;gt; &amp;quot;$username&amp;quot;,
+    mode =&amp;gt; &#39;0700&#39;,
+    require =&amp;gt; User[&amp;quot;$username&amp;quot;],
+  }
+  file { &amp;quot;/home/$username/.ssh/authorized_keys&amp;quot;:
+    ensure =&amp;gt; file,
+    source =&amp;gt; &amp;quot;puppet:///modules/yellowaxe/$username/authorized_keys&amp;quot;,
+    owner =&amp;gt; &amp;quot;$username&amp;quot;,
+    group =&amp;gt; &amp;quot;$username&amp;quot;,
+    mode =&amp;gt; &#39;0600&#39;,
+    require =&amp;gt; File[&amp;quot;/home/$username/.ssh&amp;quot;],
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Since all passwords are disabled, we will be using public/private keys with SSH. If you have users that already have public keys available, this allows you push them right now.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::ssh {
+  # locking down SSH
+  # Only thing changed is to disable root login and disallow passwords
+  package { &#39;openssh-server&#39;:
+    ensure =&amp;gt; installed,
+  } -&amp;gt;
+  file { &#39;sshd_config&#39;:
+    path =&amp;gt; &#39;/etc/ssh/sshd_config&#39;,
+    ensure  =&amp;gt; file,
+    content =&amp;gt; template(&#39;yellowaxe/sshd_config.erb&#39;),
+    owner =&amp;gt; &#39;root&#39;,
+    group =&amp;gt; &#39;root&#39;,
+    mode =&amp;gt; &#39;0640&#39;,
+  } ~&amp;gt;
+  service { &#39;sshd&#39;:
+    name =&amp;gt; &#39;ssh&#39;,
+    ensure =&amp;gt; running,
+    enable =&amp;gt; true,
+    hasstatus =&amp;gt; true,
+    hasrestart =&amp;gt; true,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This locks down SSH configuration according to your needs. The template sshd_config file just have root login and password login disabled. You can add more of course.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::firewall-rules {
+  $ufw_bin = &#39;/usr/sbin/ufw&#39;
+  # setup firewall rules
+  package { &#39;ufw&#39;:
+    ensure =&amp;gt; present,
+  } -&amp;gt;
+  exec { &amp;quot;$ufw_bin --force reset&amp;quot;: } -&amp;gt;
+  exec { &amp;quot;$ufw_bin default deny incoming&amp;quot;: } -&amp;gt;
+  exec { &amp;quot;$ufw_bin default allow outgoing&amp;quot;: } -&amp;gt;
+  exec { &amp;quot;$ufw_bin allow http/tcp&amp;quot;: } -&amp;gt;
+  exec { &amp;quot;$ufw_bin allow https/tcp&amp;quot;: } -&amp;gt;
+  exec { &amp;quot;$ufw_bin allow ssh/tcp&amp;quot;: } -&amp;gt;
+  exec { &amp;quot;$ufw_bin limit ssh/tcp&amp;quot;: } -&amp;gt;
+  exec { &amp;quot;$ufw_bin --force enable&amp;quot;: }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;ufw&lt;/code&gt; is super easy to use, this is series of commands to reset and configure the firewall using &lt;code&gt;ufw&lt;/code&gt;. It places a connection rate limit on the ssh port as well.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::enable-auto-security-updates {
+  # defaults on ubuntu precise is already security only
+  package { &#39;unattended-upgrades&#39;:
+    ensure =&amp;gt; installed,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Unattended upgrades isn&amp;rsquo;t suitable for all situations. For a small shop, it&amp;rsquo;s much better to have it on than depending on someone to do securities upgrade manually.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::logwatch {
+  # configure log watcher to email us
+  package { &#39;logwatch&#39;:
+    ensure =&amp;gt; installed,
+  } -&amp;gt;
+  file { &#39;00logwatch&#39;:
+    path =&amp;gt; &#39;/etc/cron.daily/00logwatch&#39;,
+    ensure  =&amp;gt; file,
+    content =&amp;gt; template(&#39;yellowaxe/00logwatch.erb&#39;),
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Very basic tool to monitor logs daily. The template adds the command to mail the report to me.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::zsh {
+  # I like zsh
+  package { &#39;zsh&#39;:
+    ensure =&amp;gt; installed,
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I do like zsh.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class yellowaxe::zsh-user ($username) {
+  # override the given user with zsh
+  User &amp;lt;| title == &amp;quot;$username&amp;quot; |&amp;gt; {
+    shell =&amp;gt; &#39;/usr/bin/zsh&#39;,
+    require =&amp;gt; Package[&#39;zsh&#39;],
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Since we have zsh, some user would prefer to have this instead of the default shell. This uses a special collector syntax to override the user resource configuration. This might not be the most &amp;ldquo;puppet&amp;rdquo; way to do this, but it&amp;rsquo;s pretty straightforward for me to understand.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;node default {
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A node in puppet term is a server. The &lt;code&gt;node&lt;/code&gt; keyword can specifies 1 or more multiple servers. &lt;code&gt;default&lt;/code&gt; is a special keyword that will match against any unspecified servers. Since I have only 1 server right now, I went ahead with default.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  class { &#39;yellowaxe::upgrade-all-pacakges&#39;:
+    stage =&amp;gt; first
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This forces &lt;code&gt;upgrade-all-packages&lt;/code&gt; to run in the &lt;em&gt;first&lt;/em&gt; stage instead of the main stage.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  include yellowaxe::update-motd
+  include yellowaxe::timezone
+  include yellowaxe::ban-failed-logins
+  include yellowaxe::users
+  include yellowaxe::sudo-config
+  include yellowaxe::ssh
+  include yellowaxe::logwatch
+  include yellowaxe::firewall-rules
+  include yellowaxe::enable-auto-security-updates
+  include yellowaxe::zsh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is a simple way to apply (e.g. instantiates) the class&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  class { &#39;yellowaxe::normal-user&#39;:
+    username =&amp;gt; &#39;app&#39;,
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In this case, normal-user is used, but supplied with a new user name as &amp;ldquo;app&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;The rest of the file is more of the same and you can see some additional modules that I have commented out, but can be used depending on the purpose of the server.&lt;/p&gt;
+
+&lt;h3 id=&#34;putting-it-all-together&#34;&gt;Putting it all together&lt;/h3&gt;
+
+&lt;p&gt;With this file and the supporting templates in place, Vagrant can now use all the pieces to provision the server. This as simple as running &lt;code&gt;vagrant up&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;This Vagrant and Puppet setup allows you to easily stand up and tear down development servers as VMs for testing. When it comes to deploying a production server, you will be faced with a blank server and the sequence becomes:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;run &lt;code&gt;puppet-bootstrap.sh&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;git clone &amp;lt;your_tested_puppet_configuration_repo&amp;gt;&lt;/code&gt; or copy over the puppet configuration via other means&lt;/li&gt;
+&lt;li&gt;then &lt;code&gt;puppet apply &amp;lt;path_to_site.pp&amp;gt;&lt;/code&gt; (the default modules directory is /etc/puppet/modules)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This is a puppet standalone setup. Puppet can also operate in a master/agent configuration and will allow you to execute puppet configuration remotely. I don&amp;rsquo;t see myself needing a master/agent setup anytime soon.&lt;/p&gt;
+
+&lt;h3 id=&#34;closing&#34;&gt;Closing&lt;/h3&gt;
+
+&lt;p&gt;Vagrant is so nice. Simple and easy to learn. If you know even just a little ruby, the configurations will be very clear to you. It&amp;rsquo;s too bad I took this long to try it.&lt;/p&gt;
+
+&lt;p&gt;It was pretty easy to learn enough Puppet in a day to put this together. In the process, I definitely feel there are some dissonances to using Puppet for me.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Creating a new language isn&amp;rsquo;t easy. The Puppet DSL has several gotchas (class inheritance oddities). Would using straight ruby avoid this kind of issues?&lt;/li&gt;
+&lt;li&gt;I do appreciate the fact that sysadmins don&amp;rsquo;t need to be programmers use Puppet, but I wonder how far you can take that. Good sysadmins are very paranoid people, I would be pretty leery of using third party modules without fully understanding what it&amp;rsquo;s doing. And that means you will need to read and possibly modify ruby code.&lt;/li&gt;
+&lt;li&gt;Having to use the Puppet language for definitions and having to use ruby for extensions to the system result in making some simple things more difficult. For example, in the user resource, I would have wanted to randomly generate a password and assign it to the user. This can be done simply using &lt;code&gt;pwgen&lt;/code&gt; and &lt;code&gt;mkpasswd&lt;/code&gt;, but there isn&amp;rsquo;t a way for me to capture output of a command as a variable. I would have to write a custom function in ruby.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I am curious to see how &lt;a href=&#34;http://docs.opscode.com&#34;&gt;Chef&lt;/a&gt; and &lt;a href=&#34;http://www.ansibleworks.com&#34;&gt;Ansible&lt;/a&gt; compare to Puppet. Maybe next time.&lt;/p&gt;
+
+&lt;h3 id=&#34;appendix-of-all-files&#34;&gt;Appendix of all files&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;{{site.url}}/media/puppet/Vagrantfile.txt&#34;&gt;Vagrantfile&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;{{site.url}}/media/puppet/puppet-bootstrap.sh.txt&#34;&gt;puppet-bootstrap.sh&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;{{site.url}}/media/puppet/site.pp.txt&#34;&gt;site.pp&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

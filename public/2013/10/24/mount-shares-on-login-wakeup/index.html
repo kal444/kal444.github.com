@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mount shares on OS X on Login and Wakeup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Setting up OS X to mount a share on Login and Wakeup to a fixed location">
+  <meta name="generator" content="Hugo 0.17" />
+  <link href="" rel="alternate" type="application/rss+xml" title="Write More" />
+  <link href="http://kal444.github.io/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://kal444.github.io/css/hc.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  
+    
+    </head>
+    <body>
+<div class="nav-toggle"><i class="fa fa-bars fa-2x"></i> Herring Cove </div>
+      <div id = "wrapper">
+
+
+<div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="http://kal444.github.io/"><p class="navbar-brand">Write More</p></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+					
+					
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+
+       
+       <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+					<img src="" />
+          <li class="sidebar-brand"><a href="http://kal444.github.io/"><h1 class="brand">Write More</h1></a><h3></h3></li>
+          <hr />
+					
+          <hr />
+          <div id="social-wrapper">
+           
+           
+           
+           
+         </div>
+       </ul>
+     </div>
+
+
+
+     <div class="container">
+
+
+  <div id="article">
+   <div class="article-title">Mount shares on OS X on Login and Wakeup</div>
+   <p class="meta"><small>&nbsp;<i class="fa fa-calendar-o"></i> 2013-10-24</small></p> <hr/>
+   <div class="post">
+     
+
+<p>I bought a macbook air recently. This is my first mac, but I am very familiar with Unix/Linux. This is part of a series of posts on using OS X (Mountain Lion).</p>
+
+<p><a href="{{site.url}}/osx-automount-mds-oddity/">Last time</a>, I wanted to use automount to mount a Samba share at a fixed location. It didn&rsquo;t work as I expected.</p>
+
+<p>This time around, I am going to go the simple route and use <code>launchd</code> to mount the share whenever I login.</p>
+
+<blockquote>
+<p>launchd &ndash; System wide and per-user daemon/agent manager</p>
+</blockquote>
+
+<p>In other words, you can use launchd to launch things. :) It&rsquo;s great!</p>
+
+<h3 id="launch-a-script-at-login">Launch a script at login</h3>
+
+<p>According to <code>man launchd</code>, user specific launching instructions are stored in <code>~/Library/LaunchAgents</code>. It&rsquo;s pretty easy to figure out the syntax just by looking at the examples that&rsquo;s already there. But for the comprehensive explanation on the plist format for <code>launchd</code>, look at <code>man launchd.plist</code>.</p>
+
+<p>I ended up with this:</p>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple Computer//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+&lt;dict&gt;
+	&lt;key&gt;Label&lt;/key&gt;
+	&lt;string&gt;com.yellowaxe.berunda-mounts&lt;/string&gt;
+	&lt;key&gt;ProgramArguments&lt;/key&gt;
+	&lt;array&gt;
+		&lt;string&gt;/Users/kal/usr/bin/berunda-mount-shares&lt;/string&gt;
+	&lt;/array&gt;
+	&lt;key&gt;RunAtLoad&lt;/key&gt;
+	&lt;true/&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;
+</code></pre>
+
+<p>It&rsquo;s important to put in the full path to your script instead of <code>~kal/usr/bin/berunda-mount-shares</code>.</p>
+
+<p>You can then load this .plist file using <code>launchctl load ~/Library/LaunchAgents/&lt;plist-file-name&gt;</code></p>
+
+<h4 id="berunda-mount-shares"><code>berunda-mount-shares</code></h4>
+
+<pre><code>#!/bin/sh
+
+for i in `seq 1 9`; do
+  # wait until interface is active again.
+  # is there a better way to do this?
+  ifconfig en0 | grep -q 'status: active' &amp;&amp; break;
+  sleep 5
+done
+
+ping -q -c1 berunda &gt;/dev/null || exit; # server not up
+
+pw=$(security find-internet-password -w -a kal -s berunda)
+
+mount | grep -q /opt/kyle/berunda/media &amp;&amp; exit; # already mounted
+mount -t smbfs smb://kal:$pw@berunda/media /opt/kyle/berunda/media
+</code></pre>
+
+<p>The for loop is put in to wait for the network interface to become active. This seems to be needed more for the wakeup step. I added some additional changes for server&rsquo;s status and if the mount is already there.</p>
+
+<p><code>security find-internet-password</code> is a great way to find your password in the OS X keychain. You do have to store the password in the keychain first&hellip; The easiest way is to mount the share in Finder and have it remember your password.</p>
+
+<p><em>Note that the mount command WILL expose your password on the command line (briefly) since it passes the password to <code>mount_smbfs</code></em></p>
+
+<h3 id="launching-a-script-when-the-laptop-wakes-up">Launching a script when the laptop wakes up</h3>
+
+<p>For completeness, I wanted to unmount a share when the computer sleeps and remount it when the computer wakes back up. For this, I turn to: <a href="http://www.bernhard-baehr.de/">SleepWatcher</a>. However, I am not going to install it from the site&hellip;</p>
+
+<p>Thanks to a friend, I was turned onto <a href="http://brew.sh/">Homebrew</a>. It&rsquo;s a simple <code>brew install sleepwatcher</code> to install this.</p>
+
+<p>Running SleepWatcher involves our old friend <code>launchd</code> again. Here is the .plist file to use.</p>
+
+<h4 id="de-bernhard-baehr-sleepwatcher-plist"><code>de.bernhard-baehr.sleepwatcher.plist</code></h4>
+
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple Computer//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+&lt;dict&gt;
+	&lt;key&gt;Label&lt;/key&gt;
+	&lt;string&gt;de.bernhard-baehr.sleepwatcher&lt;/string&gt;
+	&lt;key&gt;ProgramArguments&lt;/key&gt;
+	&lt;array&gt;
+		&lt;string&gt;/usr/local/sbin/sleepwatcher&lt;/string&gt;
+		&lt;string&gt;-V&lt;/string&gt;
+                &lt;string&gt;-s /Users/kal/usr/bin/on-sleep&lt;/string&gt;
+                &lt;string&gt;-w /Users/kal/usr/bin/on-wakeup&lt;/string&gt;
+	&lt;/array&gt;
+	&lt;key&gt;RunAtLoad&lt;/key&gt;
+	&lt;true/&gt;
+	&lt;key&gt;KeepAlive&lt;/key&gt;
+	&lt;true/&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;
+</code></pre>
+
+<p><code>on-wakeup</code> just simply calls <code>~kal/usr/bin/berunda-mount-shares</code> and <code>on-sleep</code> calls <code>~kal/usr/bin/berunda-umount-shares</code>.</p>
+
+<p>And to finish this out.</p>
+
+<h4 id="berunda-umount-shares"><code>berunda-umount-shares</code></h4>
+
+<pre><code>#!/bin/sh
+
+ping -q -c1 berunda &gt;/dev/null || exit; # server not up
+
+mount | grep -q /opt/kyle/berunda/media || exit; # already unmounted
+umount /opt/kyle/berunda/media
+</code></pre>
+
+<p>So far, this has been working great.</p>
+
+   </div>
+ </div>
+
+
+ <a href="https://twitter.com/share" class="twitter-share-button " data-size="small" data-count="none">Tweet</a>
+ <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+ <ul class="pager">
+      &nbsp;<li class="previous"><a href="http://kal444.github.io/2013/10/25/rvm-wrangling/"> RVM wrangling on OS X</a></li>
+      &nbsp;<li class="next"><a href="http://kal444.github.io/2013/10/19/osx-automount-mds-oddity/"> Automount Oddity in OS X with Spotlight metadata server (mds)</a></li>
+</ul>
+
+
+
+    </ul>
+    </div>
+    <footer>
+
+        <p class="text-muted credit">&copy; 2016. All rights reserved. </p>
+    </footer>
+ 
+    <script src="http://kal444.github.io/js/jquery-1.10.2.min.js"></script>
+    <script src="http://kal444.github.io/js/bootstrap.min.js"></script>
+    <script src="http://kal444.github.io/js/bootstrap.js"></script>
+    <script type="text/javascript" src="http://kal444.github.io/js/hc.js"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Combine OS X default wallpapers with customized ones</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Combine OS X default wallpapers with customized ones">
+  <meta name="generator" content="Hugo 0.17" />
+  <link href="" rel="alternate" type="application/rss+xml" title="Write More" />
+  <link href="http://kal444.github.io/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://kal444.github.io/css/hc.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  
+    
+    </head>
+    <body>
+<div class="nav-toggle"><i class="fa fa-bars fa-2x"></i> Herring Cove </div>
+      <div id = "wrapper">
+
+
+<div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="http://kal444.github.io/"><p class="navbar-brand">Write More</p></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+					
+					
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+
+       
+       <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+					<img src="" />
+          <li class="sidebar-brand"><a href="http://kal444.github.io/"><h1 class="brand">Write More</h1></a><h3></h3></li>
+          <hr />
+					
+          <hr />
+          <div id="social-wrapper">
+           
+           
+           
+           
+         </div>
+       </ul>
+     </div>
+
+
+
+     <div class="container">
+
+
+  <div id="article">
+   <div class="article-title">Combine OS X default wallpapers with customized ones</div>
+   <p class="meta"><small>&nbsp;<i class="fa fa-calendar-o"></i> 2013-10-27</small></p> <hr/>
+   <div class="post">
+     <p>I just upgraded to OS X Mavericks, but this applied equally to OS X Mountain Lion.</p>
+
+<p>As it turns out, in addition the default desktop wallpapers included by Apple, there are a set of images to be used by the screen saver. These are great as desktop wallpapers too!</p>
+
+<p>You can find where there are here: <a href="http://apple.stackexchange.com/a/106039">Secret Wallpapers</a></p>
+
+<p>But, that&rsquo;s not what this post is about.</p>
+
+<p>Let&rsquo;s say you want to use those pictures AND you want to use the default ones in a rotational setting. Since you can&rsquo;t move the desktop pictures folder from Apple to Folders, you can only pick either you own folders or the Apple one.
+<img src="{{site.url}}/media/desktop-pictures.jpg" alt="Desktop Pictures" /></p>
+
+<p>I don&rsquo;t want to make a copy of the provided desktop pictures. First I tried to create a symbolic link to the Desktop Pictures directory, but Desktop &amp; Screen Saver dialog is smart enough to know that it&rsquo;s the same folder as the one under Apple.</p>
+
+<p>This works though:</p>
+
+<pre><code>mkdir -p ~/Pictures/Apple\ Provided
+cd ~/Pictures/Apple\ Provided
+for i in /Library/Desktop\ Pictures/*.jpg; do ln -s &quot;$i&quot; &quot;`basename $i`&quot; ; done
+</code></pre>
+
+<p>Then, add <code>~/Pictures/Apple\ Provided</code> to Folders and select Folders.</p>
+
+<p>That&rsquo;s it.</p>
+
+   </div>
+ </div>
+
+
+ <a href="https://twitter.com/share" class="twitter-share-button " data-size="small" data-count="none">Tweet</a>
+ <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+ <ul class="pager">
+      &nbsp;<li class="previous"><a href="http://kal444.github.io/2013/12/15/amazon-app-store/"> How does Amazon app store work?</a></li>
+      &nbsp;<li class="next"><a href="http://kal444.github.io/2013/10/25/rvm-wrangling/"> RVM wrangling on OS X</a></li>
+</ul>
+
+
+
+    </ul>
+    </div>
+    <footer>
+
+        <p class="text-muted credit">&copy; 2016. All rights reserved. </p>
+    </footer>
+ 
+    <script src="http://kal444.github.io/js/jquery-1.10.2.min.js"></script>
+    <script src="http://kal444.github.io/js/bootstrap.min.js"></script>
+    <script src="http://kal444.github.io/js/bootstrap.js"></script>
+    <script type="text/javascript" src="http://kal444.github.io/js/hc.js"></script>
+</body>
+
+</html>
+

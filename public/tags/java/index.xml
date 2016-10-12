@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Write More</title>
+    <link>http://kal444.github.io/tags/java/index.xml</link>
+    <description>Recent content on Write More</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <atom:link href="http://kal444.github.io/tags/java/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Java 8 Features - Lambdas and Method References</title>
+      <link>http://kal444.github.io/2014/01/15/java-8-lambdas/</link>
+      <pubDate>Wed, 15 Jan 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://kal444.github.io/2014/01/15/java-8-lambdas/</guid>
+      <description>
+
+&lt;p&gt;After a long wait, Java 8 is finally close to release. I am going to dig through the feature list and learn about the upcoming features. First, the headliner of Java 8 - lambda expressions.&lt;/p&gt;
+
+&lt;h3 id=&#34;lambda-expressions&#34;&gt;Lambda Expressions&lt;/h3&gt;
+
+&lt;p&gt;Lambda expression is a concise way to express an anonymous function. The existing way for Java to pass functions around is using an anonymous inner class. This can be pretty wordy.&lt;/p&gt;
+
+
+        Callable&lt;String&gt; callable = new Callable&lt;String&gt;() {
+            @Override
+            public String call() throws Exception {
+                return &#34;I am called&#34;;
+            }
+        };
+        callable.call();
+
+
+&lt;p&gt;In Java 8, this becomes&lt;/p&gt;
+
+
+        Callable&lt;String&gt; callable = () -&gt; &#34;I am called&#34;;
+        callable.call();
+
+
+&lt;p&gt;Nice and short. On the right hand side, there is no need to specify you are implementing the &lt;code&gt;call()&lt;/code&gt; method on &lt;code&gt;Callable&lt;/code&gt;. The compiler figured that out by inferring the type (&lt;code&gt;Callable&lt;/code&gt;) from the left hand side, which provides the context. There is no need to specify &lt;code&gt;call()&lt;/code&gt; method because it only support interfaces with single public method. The new name for these types of interfaces is &lt;em&gt;functional interfaces&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;In the simplest case, you don&amp;rsquo;t even need to provide a return statement since the result of the single expression will be used as the value for the return statement. In more complex cases, a block of statements can be provided instead of the expression.&lt;/p&gt;
+
+&lt;p&gt;When there is no left hand side and thus no context to infer the type from, a cast is needed to give the compiler a hint.&lt;/p&gt;
+
+
+        ((Runnable) () -&gt; {
+            System.out.println(&#34;Hi!&#34;);
+        }).run();
+
+
+&lt;h4 id=&#34;method-parameters&#34;&gt;Method Parameters&lt;/h4&gt;
+
+&lt;p&gt;When the implementable method has parameters, they typically don&amp;rsquo;t need to be provided either. The compiler will determine them from the interface method declaration.&lt;/p&gt;
+
+
+        Comparator&lt;String&gt; comparator = (s1, s2) -&gt; s1.compareToIgnoreCase(s2);
+
+
+&lt;h4 id=&#34;where-is-this-pointing-to&#34;&gt;Where is this pointing to?&lt;/h4&gt;
+
+&lt;p&gt;&lt;code&gt;this&lt;/code&gt; is a bit tricky inside lambdas. The &lt;code&gt;this&lt;/code&gt; object basically references the enclosing instance. This is different from anonymous inner classes, but it makes perfect sense when you see it.&lt;/p&gt;
+
+
+public class LambdaTest {
+    @Test
+    public void simple_lambda() throws Exception {
+        // in lambda,
+        // scoping causes &#34;this&#34; to point to the instance of LambdaTest instead of the lambda expression itself
+        ((Runnable) () -&gt; {
+            assertEquals(&#34;LambdaTest&#34;, this.toString());
+        }).run();
+        // in anonymous inner class, this is different
+        // practically, this makes sense, as I can make actual use of &#34;this&#34; in an anon-inner class
+        (new Runnable() {
+            @Override
+            public void run() {
+                assertEquals(&#34;Inner&#34;, this.toString());
+            }
+            @Override
+            public String toString() {
+                return &#34;Inner&#34;;
+            }
+        }).run();
+    }
+    @Override
+    public String toString() {
+        return LambdaTest.class.getSimpleName();
+    }
+}
+
+
+&lt;h4 id=&#34;variable-capture&#34;&gt;Variable capture&lt;/h4&gt;
+
+&lt;p&gt;Just like anonymous inner class, using variable from outside the lambda has restrictions. The compiler is smart enough to know if you are changing the capture variable.&lt;/p&gt;
+
+
+        int size = 100;
+        ((Runnable) () -&gt; System.out.println(size)).run();
+        //size++; //this causes a compilation error when uncommented - size needs to be effectively final
+
+
+&lt;p&gt;Interestingly, you can get around this by using a method reference. I will show an example in the next section.&lt;/p&gt;
+
+&lt;h3 id=&#34;method-references&#34;&gt;Method References&lt;/h3&gt;
+
+&lt;p&gt;Once you can create lambdas, method references make a lot sense. This allows you use an existing method in a lambda like way.&lt;/p&gt;
+
+&lt;p&gt;For example, you can write a lambda like this:&lt;/p&gt;
+
+
+        Comparator&lt;String&gt; comparator1 = (s1, s2) -&gt; s1.compareToIgnoreCase(s2);
+
+
+&lt;p&gt;And you can rewrite it using a method reference like this:&lt;/p&gt;
+
+
+        Comparator&lt;String&gt; comparator2 = String::compareToIgnoreCase;
+
+
+&lt;p&gt;I was a bit surprised that it figured out Comparator&amp;rsquo;s compare(o1, o2) method maps to o1.compareToIgnoreCase(o2). Based on the spec, the first parameter will be used as the receiver of the method reference and the rest of the parameters will be passed as parameters to the method in the method reference.&lt;/p&gt;
+
+&lt;p&gt;In addition to this format, there are additional syntax to satisfy calling a method reference for an instance, a static method, super class method, constructor and array constructor.&lt;/p&gt;
+
+&lt;p&gt;Calling an instance method on an object has an interesting twist.&lt;/p&gt;
+
+
+        Set&lt;String&gt; items = Collections.singleton(&#34;OK&#34;);
+        Predicate&lt;String&gt; doesContain = items::contains;
+        items = Collections.singleton(&#34;NOT OK&#34;);
+        assertFalse(items.contains(&#34;OK&#34;));
+        assertTrue(doesContain.test(&#34;OK&#34;));
+
+
+&lt;p&gt;The code above works. This surprised me. I was expecting a compilation error since I made a modification to items. But method reference must be doing something more complex than re-writing as a lambda behind the scene. Very likely, it stored &lt;code&gt;items&lt;/code&gt; object in another reference in the object that represented the method reference.&lt;/p&gt;
+
+&lt;p&gt;It probably looked similar to this:
+
+        Set&lt;String&gt; items = Collections.singleton(&#34;OK&#34;);
+        // start of method reference 
+        Set&lt;String&gt; reference = items;
+        Predicate&lt;String&gt; doesContain = (s) -&gt; reference.contains(s);
+        // end of method reference 
+        items = Collections.singleton(&#34;NOT OK&#34;);
+        assertFalse(items.contains(&#34;OK&#34;));
+        assertTrue(doesContain.test(&#34;OK&#34;));
+&lt;/p&gt;
+
+&lt;h3 id=&#34;closing&#34;&gt;Closing&lt;/h3&gt;
+
+&lt;p&gt;I am looking forward to using these once Java 8 comes out. Many times, I shun the use of anonymous inner classes for functional logic due to the verbosity (and the ugliness) of the result code. Being able to use lambda and method reference will go a long way to make function style logic clear and concise in Java!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Write More</title>
+    <link>http://kal444.github.io/tags/configuration/index.xml</link>
+    <description>Recent content on Write More</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <atom:link href="http://kal444.github.io/tags/configuration/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Combine OS X default wallpapers with customized ones</title>
+      <link>http://kal444.github.io/2013/10/27/bring-together-desktop-pictures/</link>
+      <pubDate>Sun, 27 Oct 2013 00:00:00 +0000</pubDate>
+      
+      <guid>http://kal444.github.io/2013/10/27/bring-together-desktop-pictures/</guid>
+      <description>&lt;p&gt;I just upgraded to OS X Mavericks, but this applied equally to OS X Mountain Lion.&lt;/p&gt;
+
+&lt;p&gt;As it turns out, in addition the default desktop wallpapers included by Apple, there are a set of images to be used by the screen saver. These are great as desktop wallpapers too!&lt;/p&gt;
+
+&lt;p&gt;You can find where there are here: &lt;a href=&#34;http://apple.stackexchange.com/a/106039&#34;&gt;Secret Wallpapers&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;But, that&amp;rsquo;s not what this post is about.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s say you want to use those pictures AND you want to use the default ones in a rotational setting. Since you can&amp;rsquo;t move the desktop pictures folder from Apple to Folders, you can only pick either you own folders or the Apple one.
+&lt;img src=&#34;{{site.url}}/media/desktop-pictures.jpg&#34; alt=&#34;Desktop Pictures&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I don&amp;rsquo;t want to make a copy of the provided desktop pictures. First I tried to create a symbolic link to the Desktop Pictures directory, but Desktop &amp;amp; Screen Saver dialog is smart enough to know that it&amp;rsquo;s the same folder as the one under Apple.&lt;/p&gt;
+
+&lt;p&gt;This works though:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mkdir -p ~/Pictures/Apple\ Provided
+cd ~/Pictures/Apple\ Provided
+for i in /Library/Desktop\ Pictures/*.jpg; do ln -s &amp;quot;$i&amp;quot; &amp;quot;`basename $i`&amp;quot; ; done
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, add &lt;code&gt;~/Pictures/Apple\ Provided&lt;/code&gt; to Folders and select Folders.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s it.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

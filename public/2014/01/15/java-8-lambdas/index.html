@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Java 8 Features - Lambdas and Method References</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Examples of lambda usage in Java 8">
+  <meta name="generator" content="Hugo 0.17" />
+  <link href="" rel="alternate" type="application/rss+xml" title="Write More" />
+  <link href="http://kal444.github.io/css/bootstrap.min.css" rel="stylesheet">
+  <link href="http://kal444.github.io/css/hc.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+  
+    
+    </head>
+    <body>
+<div class="nav-toggle"><i class="fa fa-bars fa-2x"></i> Herring Cove </div>
+      <div id = "wrapper">
+
+
+<div class="navbar navbar-default" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="http://kal444.github.io/"><p class="navbar-brand">Write More</p></a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+					
+					
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+
+       
+       <div id="sidebar-wrapper">
+        <ul class="sidebar-nav">
+					<img src="" />
+          <li class="sidebar-brand"><a href="http://kal444.github.io/"><h1 class="brand">Write More</h1></a><h3></h3></li>
+          <hr />
+					
+          <hr />
+          <div id="social-wrapper">
+           
+           
+           
+           
+         </div>
+       </ul>
+     </div>
+
+
+
+     <div class="container">
+
+
+  <div id="article">
+   <div class="article-title">Java 8 Features - Lambdas and Method References</div>
+   <p class="meta"><small>&nbsp;<i class="fa fa-calendar-o"></i> 2014-01-15</small></p> <hr/>
+   <div class="post">
+     
+
+<p>After a long wait, Java 8 is finally close to release. I am going to dig through the feature list and learn about the upcoming features. First, the headliner of Java 8 - lambda expressions.</p>
+
+<h3 id="lambda-expressions">Lambda Expressions</h3>
+
+<p>Lambda expression is a concise way to express an anonymous function. The existing way for Java to pass functions around is using an anonymous inner class. This can be pretty wordy.</p>
+
+
+        Callable<String> callable = new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return "I am called";
+            }
+        };
+        callable.call();
+
+
+<p>In Java 8, this becomes</p>
+
+
+        Callable<String> callable = () -> "I am called";
+        callable.call();
+
+
+<p>Nice and short. On the right hand side, there is no need to specify you are implementing the <code>call()</code> method on <code>Callable</code>. The compiler figured that out by inferring the type (<code>Callable</code>) from the left hand side, which provides the context. There is no need to specify <code>call()</code> method because it only support interfaces with single public method. The new name for these types of interfaces is <em>functional interfaces</em>.</p>
+
+<p>In the simplest case, you don&rsquo;t even need to provide a return statement since the result of the single expression will be used as the value for the return statement. In more complex cases, a block of statements can be provided instead of the expression.</p>
+
+<p>When there is no left hand side and thus no context to infer the type from, a cast is needed to give the compiler a hint.</p>
+
+
+        ((Runnable) () -> {
+            System.out.println("Hi!");
+        }).run();
+
+
+<h4 id="method-parameters">Method Parameters</h4>
+
+<p>When the implementable method has parameters, they typically don&rsquo;t need to be provided either. The compiler will determine them from the interface method declaration.</p>
+
+
+        Comparator<String> comparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
+
+
+<h4 id="where-is-this-pointing-to">Where is this pointing to?</h4>
+
+<p><code>this</code> is a bit tricky inside lambdas. The <code>this</code> object basically references the enclosing instance. This is different from anonymous inner classes, but it makes perfect sense when you see it.</p>
+
+
+public class LambdaTest {
+    @Test
+    public void simple_lambda() throws Exception {
+        // in lambda,
+        // scoping causes "this" to point to the instance of LambdaTest instead of the lambda expression itself
+        ((Runnable) () -> {
+            assertEquals("LambdaTest", this.toString());
+        }).run();
+        // in anonymous inner class, this is different
+        // practically, this makes sense, as I can make actual use of "this" in an anon-inner class
+        (new Runnable() {
+            @Override
+            public void run() {
+                assertEquals("Inner", this.toString());
+            }
+            @Override
+            public String toString() {
+                return "Inner";
+            }
+        }).run();
+    }
+    @Override
+    public String toString() {
+        return LambdaTest.class.getSimpleName();
+    }
+}
+
+
+<h4 id="variable-capture">Variable capture</h4>
+
+<p>Just like anonymous inner class, using variable from outside the lambda has restrictions. The compiler is smart enough to know if you are changing the capture variable.</p>
+
+
+        int size = 100;
+        ((Runnable) () -> System.out.println(size)).run();
+        //size++; //this causes a compilation error when uncommented - size needs to be effectively final
+
+
+<p>Interestingly, you can get around this by using a method reference. I will show an example in the next section.</p>
+
+<h3 id="method-references">Method References</h3>
+
+<p>Once you can create lambdas, method references make a lot sense. This allows you use an existing method in a lambda like way.</p>
+
+<p>For example, you can write a lambda like this:</p>
+
+
+        Comparator<String> comparator1 = (s1, s2) -> s1.compareToIgnoreCase(s2);
+
+
+<p>And you can rewrite it using a method reference like this:</p>
+
+
+        Comparator<String> comparator2 = String::compareToIgnoreCase;
+
+
+<p>I was a bit surprised that it figured out Comparator&rsquo;s compare(o1, o2) method maps to o1.compareToIgnoreCase(o2). Based on the spec, the first parameter will be used as the receiver of the method reference and the rest of the parameters will be passed as parameters to the method in the method reference.</p>
+
+<p>In addition to this format, there are additional syntax to satisfy calling a method reference for an instance, a static method, super class method, constructor and array constructor.</p>
+
+<p>Calling an instance method on an object has an interesting twist.</p>
+
+
+        Set<String> items = Collections.singleton("OK");
+        Predicate<String> doesContain = items::contains;
+        items = Collections.singleton("NOT OK");
+        assertFalse(items.contains("OK"));
+        assertTrue(doesContain.test("OK"));
+
+
+<p>The code above works. This surprised me. I was expecting a compilation error since I made a modification to items. But method reference must be doing something more complex than re-writing as a lambda behind the scene. Very likely, it stored <code>items</code> object in another reference in the object that represented the method reference.</p>
+
+<p>It probably looked similar to this:
+
+        Set<String> items = Collections.singleton("OK");
+        // start of method reference 
+        Set<String> reference = items;
+        Predicate<String> doesContain = (s) -> reference.contains(s);
+        // end of method reference 
+        items = Collections.singleton("NOT OK");
+        assertFalse(items.contains("OK"));
+        assertTrue(doesContain.test("OK"));
+</p>
+
+<h3 id="closing">Closing</h3>
+
+<p>I am looking forward to using these once Java 8 comes out. Many times, I shun the use of anonymous inner classes for functional logic due to the verbosity (and the ugliness) of the result code. Being able to use lambda and method reference will go a long way to make function style logic clear and concise in Java!</p>
+
+   </div>
+ </div>
+
+
+ <a href="https://twitter.com/share" class="twitter-share-button " data-size="small" data-count="none">Tweet</a>
+ <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+ <ul class="pager">
+     
+      &nbsp;<li class="next"><a href="http://kal444.github.io/2013/12/29/vagrant-puppet-server-setup/"> Basic configuration for a new server using Puppet and Vagrant</a></li>
+</ul>
+
+
+
+    </ul>
+    </div>
+    <footer>
+
+        <p class="text-muted credit">&copy; 2016. All rights reserved. </p>
+    </footer>
+ 
+    <script src="http://kal444.github.io/js/jquery-1.10.2.min.js"></script>
+    <script src="http://kal444.github.io/js/bootstrap.min.js"></script>
+    <script src="http://kal444.github.io/js/bootstrap.js"></script>
+    <script type="text/javascript" src="http://kal444.github.io/js/hc.js"></script>
+</body>
+
+</html>
+

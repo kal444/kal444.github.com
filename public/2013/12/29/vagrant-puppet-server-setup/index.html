@@ -84,44 +84,44 @@
 
 <p>Let me go through the sections in the file.</p>
 
-<p>
-  config.vm.box = "puppet-labs-ubuntu-server-12042-x64-vbox4210-nocm."
-  config.vm.box_url = "http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box"
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>  <span style="color: #f8f8f2">config</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">box</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;puppet-labs-ubuntu-server-12042-x64-vbox4210-nocm.&quot;</span>
+  <span style="color: #f8f8f2">config</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">box_url</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box&quot;</span>
+</pre></div>
 
 This pulls down the preconfigured base box from puppetlabs.com. This is the blank slate you start with. I used Ubuntu x64 12.04 LTS <em>aka</em> Precise Pangolin. You can see more base boxes <a href="http://puppet-vagrant-boxes.puppetlabs.com">here</a> and <a href="http://www.vagrantbox.es">here</a>. I also picked the version without any CM software installed. I did this because the reasoning from the <a href="http://blog.kloudless.com/2013/07/01/automating-development-environments-with-vagrant-and-puppet">second article</a> - if you install your own CM software, then you can easily keep it up to date without changing the base box frequently.</p>
 
-<p>
-  config.vm.define :web do |web|
-    web.vm.hostname = "dev-www.yellowaxe.vm"
-    web.vm.network :private_network, ip: "192.168.33.10"
-    web.vm.network :forwarded_port, guest: 80, host: 9080
-    web.vm.network :forwarded_port, guest: 443, host: 7043
-  end
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>  <span style="color: #f8f8f2">config</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">define</span> <span style="color: #e6db74">:web</span> <span style="color: #66d9ef">do</span> <span style="color: #f92672">|</span><span style="color: #f8f8f2">web</span><span style="color: #f92672">|</span>
+    <span style="color: #f8f8f2">web</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">hostname</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;dev-www.yellowaxe.vm&quot;</span>
+    <span style="color: #f8f8f2">web</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">network</span> <span style="color: #e6db74">:private_network</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">ip</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;192.168.33.10&quot;</span>
+    <span style="color: #f8f8f2">web</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">network</span> <span style="color: #e6db74">:forwarded_port</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">guest</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">80</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">host</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">9080</span>
+    <span style="color: #f8f8f2">web</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">network</span> <span style="color: #e6db74">:forwarded_port</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">guest</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">443</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">host</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">7043</span>
+  <span style="color: #66d9ef">end</span>
+</pre></div>
 
 This section defines a VM and gives it a hostname, IP, and forward some ports. Pretty self-explanatory.</p>
 
-<p>
-  config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", "1024"]
-  end
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>  <span style="color: #f8f8f2">config</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">provider</span> <span style="color: #e6db74">:virtualbox</span> <span style="color: #66d9ef">do</span> <span style="color: #f92672">|</span><span style="color: #f8f8f2">vb</span><span style="color: #f92672">|</span>
+    <span style="color: #f8f8f2">vb</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">customize</span> <span style="color: #f92672">[</span><span style="color: #e6db74">&quot;modifyvm&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">:id</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;--memory&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">&quot;1024&quot;</span><span style="color: #f92672">]</span>
+  <span style="color: #66d9ef">end</span>
+</pre></div>
 
 This section modifies the VM using VirtualBox specific tool. You can do a lot more here. Currently, I just have it increase the memory to 1GB.</p>
 
-<p>
-  # Enable shell provisioning to bootstrap puppet
-  config.vm.provision :shell, :path => "puppet-bootstrap.sh"
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>  <span style="color: #75715e"># Enable shell provisioning to bootstrap puppet</span>
+  <span style="color: #f8f8f2">config</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">provision</span> <span style="color: #e6db74">:shell</span><span style="color: #f8f8f2">,</span> <span style="color: #e6db74">:path</span> <span style="color: #f92672">=&gt;</span> <span style="color: #e6db74">&quot;puppet-bootstrap.sh&quot;</span>
+</pre></div>
 
 This defines the first provisioner for the VM. It takes care of installing the latest version of puppet. The script is essentially the same as the one used in the kloudless article. It looks like this: <a href="{{site.url}}/media/puppet/puppet-bootstrap.sh.txt">puppet-bootstrap.sh</a>.</p>
 
-<p>
-  # Enable provisioning with Puppet stand alone.
-  config.vm.provision :puppet do |puppet|
-        puppet.manifests_path = "puppet/manifests"
-        puppet.manifest_file  = "site.pp"
-        puppet.module_path = "puppet/modules"
-        puppet.options = "--verbose"
-        #puppet.options = "--debug --verbose"
-  end
+<p><div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>  <span style="color: #75715e"># Enable provisioning with Puppet stand alone.</span>
+  <span style="color: #f8f8f2">config</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">vm</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">provision</span> <span style="color: #e6db74">:puppet</span> <span style="color: #66d9ef">do</span> <span style="color: #f92672">|</span><span style="color: #f8f8f2">puppet</span><span style="color: #f92672">|</span>
+        <span style="color: #f8f8f2">puppet</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">manifests_path</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;puppet/manifests&quot;</span>
+        <span style="color: #f8f8f2">puppet</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">manifest_file</span>  <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;site.pp&quot;</span>
+        <span style="color: #f8f8f2">puppet</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">module_path</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;puppet/modules&quot;</span>
+        <span style="color: #f8f8f2">puppet</span><span style="color: #f92672">.</span><span style="color: #f8f8f2">options</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;--verbose&quot;</span>
+        <span style="color: #75715e">#puppet.options = &quot;--debug --verbose&quot;</span>
+  <span style="color: #66d9ef">end</span>
+</pre></div>
 
 This defines the second provisioner - Puppet. This is the one that gets the work done.</p>
 

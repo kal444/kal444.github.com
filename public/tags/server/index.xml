@@ -31,44 +31,44 @@
 
 &lt;p&gt;Let me go through the sections in the file.&lt;/p&gt;
 
-&lt;p&gt;
-  config.vm.box = &#34;puppet-labs-ubuntu-server-12042-x64-vbox4210-nocm.&#34;
-  config.vm.box_url = &#34;http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box&#34;
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;box&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;puppet-labs-ubuntu-server-12042-x64-vbox4210-nocm.&amp;quot;&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;box_url&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This pulls down the preconfigured base box from puppetlabs.com. This is the blank slate you start with. I used Ubuntu x64 12.04 LTS &lt;em&gt;aka&lt;/em&gt; Precise Pangolin. You can see more base boxes &lt;a href=&#34;http://puppet-vagrant-boxes.puppetlabs.com&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;http://www.vagrantbox.es&#34;&gt;here&lt;/a&gt;. I also picked the version without any CM software installed. I did this because the reasoning from the &lt;a href=&#34;http://blog.kloudless.com/2013/07/01/automating-development-environments-with-vagrant-and-puppet&#34;&gt;second article&lt;/a&gt; - if you install your own CM software, then you can easily keep it up to date without changing the base box frequently.&lt;/p&gt;
 
-&lt;p&gt;
-  config.vm.define :web do |web|
-    web.vm.hostname = &#34;dev-www.yellowaxe.vm&#34;
-    web.vm.network :private_network, ip: &#34;192.168.33.10&#34;
-    web.vm.network :forwarded_port, guest: 80, host: 9080
-    web.vm.network :forwarded_port, guest: 443, host: 7043
-  end
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;define&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:web&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;hostname&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;dev-www.yellowaxe.vm&amp;quot;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;network&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:private_network&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;ip&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;192.168.33.10&amp;quot;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;network&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:forwarded_port&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;guest&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;80&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;host&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;9080&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;network&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:forwarded_port&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;guest&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;443&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;host&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;7043&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This section defines a VM and gives it a hostname, IP, and forward some ports. Pretty self-explanatory.&lt;/p&gt;
 
-&lt;p&gt;
-  config.vm.provider :virtualbox do |vb|
-    vb.customize [&#34;modifyvm&#34;, :id, &#34;--memory&#34;, &#34;1024&#34;]
-  end
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;provider&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:virtualbox&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vb&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;vb&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;customize&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;modifyvm&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:id&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;--memory&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;1024&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;]&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This section modifies the VM using VirtualBox specific tool. You can do a lot more here. Currently, I just have it increase the memory to 1GB.&lt;/p&gt;
 
-&lt;p&gt;
-  # Enable shell provisioning to bootstrap puppet
-  config.vm.provision :shell, :path =&gt; &#34;puppet-bootstrap.sh&#34;
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #75715e&#34;&gt;# Enable shell provisioning to bootstrap puppet&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;provision&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:shell&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:path&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;puppet-bootstrap.sh&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This defines the first provisioner for the VM. It takes care of installing the latest version of puppet. The script is essentially the same as the one used in the kloudless article. It looks like this: &lt;a href=&#34;{{site.url}}/media/puppet/puppet-bootstrap.sh.txt&#34;&gt;puppet-bootstrap.sh&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;
-  # Enable provisioning with Puppet stand alone.
-  config.vm.provision :puppet do |puppet|
-        puppet.manifests_path = &#34;puppet/manifests&#34;
-        puppet.manifest_file  = &#34;site.pp&#34;
-        puppet.module_path = &#34;puppet/modules&#34;
-        puppet.options = &#34;--verbose&#34;
-        #puppet.options = &#34;--debug --verbose&#34;
-  end
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #75715e&#34;&gt;# Enable provisioning with Puppet stand alone.&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;provision&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:puppet&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;manifests_path&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;puppet/manifests&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;manifest_file&lt;/span&gt;  &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;site.pp&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;module_path&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;puppet/modules&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;options&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;--verbose&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;#puppet.options = &amp;quot;--debug --verbose&amp;quot;&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This defines the second provisioner - Puppet. This is the one that gets the work done.&lt;/p&gt;
 

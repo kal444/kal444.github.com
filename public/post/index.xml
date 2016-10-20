@@ -22,21 +22,21 @@
 
 &lt;p&gt;Lambda expression is a concise way to express an anonymous function. The existing way for Java to pass functions around is using an anonymous inner class. This can be pretty wordy.&lt;/p&gt;
 
-
-        Callable&lt;String&gt; callable = new Callable&lt;String&gt;() {
-            @Override
-            public String call() throws Exception {
-                return &#34;I am called&#34;;
-            }
-        };
-        callable.call();
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Callable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;callable&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;Callable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;@Override&lt;/span&gt;
+            &lt;span style=&#34;color: #66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;call&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;throws&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;Exception&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+                &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;I am called&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;;&lt;/span&gt;
+            &lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
+        &lt;span style=&#34;color: #f92672&#34;&gt;};&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;callable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;call&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;In Java 8, this becomes&lt;/p&gt;
 
-
-        Callable&lt;String&gt; callable = () -&gt; &#34;I am called&#34;;
-        callable.call();
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Callable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;callable&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;I am called&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;callable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;call&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Nice and short. On the right hand side, there is no need to specify you are implementing the &lt;code&gt;call()&lt;/code&gt; method on &lt;code&gt;Callable&lt;/code&gt;. The compiler figured that out by inferring the type (&lt;code&gt;Callable&lt;/code&gt;) from the left hand side, which provides the context. There is no need to specify &lt;code&gt;call()&lt;/code&gt; method because it only support interfaces with single public method. The new name for these types of interfaces is &lt;em&gt;functional interfaces&lt;/em&gt;.&lt;/p&gt;
@@ -45,61 +45,61 @@
 
 &lt;p&gt;When there is no left hand side and thus no context to infer the type from, a cast is needed to give the compiler a hint.&lt;/p&gt;
 
-
-        ((Runnable) () -&gt; {
-            System.out.println(&#34;Hi!&#34;);
-        }).run();
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #f92672&#34;&gt;((&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;Runnable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color: #f8f8f2&#34;&gt;System&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;Hi!&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #f92672&#34;&gt;}).&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;h4 id=&#34;method-parameters&#34;&gt;Method Parameters&lt;/h4&gt;
 
 &lt;p&gt;When the implementable method has parameters, they typically don&amp;rsquo;t need to be provided either. The compiler will determine them from the interface method declaration.&lt;/p&gt;
 
-
-        Comparator&lt;String&gt; comparator = (s1, s2) -&gt; s1.compareToIgnoreCase(s2);
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Comparator&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;comparator&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s1&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;s2&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;s1&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;compareToIgnoreCase&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s2&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;h4 id=&#34;where-is-this-pointing-to&#34;&gt;Where is this pointing to?&lt;/h4&gt;
 
 &lt;p&gt;&lt;code&gt;this&lt;/code&gt; is a bit tricky inside lambdas. The &lt;code&gt;this&lt;/code&gt; object basically references the enclosing instance. This is different from anonymous inner classes, but it makes perfect sense when you see it.&lt;/p&gt;
 
-
-public class LambdaTest {
-    @Test
-    public void simple_lambda() throws Exception {
-        // in lambda,
-        // scoping causes &#34;this&#34; to point to the instance of LambdaTest instead of the lambda expression itself
-        ((Runnable) () -&gt; {
-            assertEquals(&#34;LambdaTest&#34;, this.toString());
-        }).run();
-        // in anonymous inner class, this is different
-        // practically, this makes sense, as I can make actual use of &#34;this&#34; in an anon-inner class
-        (new Runnable() {
-            @Override
-            public void run() {
-                assertEquals(&#34;Inner&#34;, this.toString());
-            }
-            @Override
-            public String toString() {
-                return &#34;Inner&#34;;
-            }
-        }).run();
-    }
-    @Override
-    public String toString() {
-        return LambdaTest.class.getSimpleName();
-    }
-}
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;LambdaTest&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;@Test&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;simple_lambda&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;throws&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;Exception&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// in lambda,&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// scoping causes &amp;quot;this&amp;quot; to point to the instance of LambdaTest instead of the lambda expression itself&lt;/span&gt;
+        &lt;span style=&#34;color: #f92672&#34;&gt;((&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;Runnable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color: #f8f8f2&#34;&gt;assertEquals&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;LambdaTest&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;());&lt;/span&gt;
+        &lt;span style=&#34;color: #f92672&#34;&gt;}).&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;();&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// in anonymous inner class, this is different&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// practically, this makes sense, as I can make actual use of &amp;quot;this&amp;quot; in an anon-inner class&lt;/span&gt;
+        &lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;new&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;Runnable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;@Override&lt;/span&gt;
+            &lt;span style=&#34;color: #66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;assertEquals&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;Inner&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;());&lt;/span&gt;
+            &lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
+            &lt;span style=&#34;color: #a6e22e&#34;&gt;@Override&lt;/span&gt;
+            &lt;span style=&#34;color: #66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+                &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;Inner&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;;&lt;/span&gt;
+            &lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
+        &lt;span style=&#34;color: #f92672&#34;&gt;}).&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;@Override&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;LambdaTest&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;class&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;getSimpleName&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;h4 id=&#34;variable-capture&#34;&gt;Variable capture&lt;/h4&gt;
 
 &lt;p&gt;Just like anonymous inner class, using variable from outside the lambda has restrictions. The compiler is smart enough to know if you are changing the capture variable.&lt;/p&gt;
 
-
-        int size = 100;
-        ((Runnable) () -&gt; System.out.println(size)).run();
-        //size++; //this causes a compilation error when uncommented - size needs to be effectively final
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;size&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;100&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;;&lt;/span&gt;
+        &lt;span style=&#34;color: #f92672&#34;&gt;((&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;Runnable&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;System&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;size&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;)).&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;run&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;();&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;//size++; //this causes a compilation error when uncommented - size needs to be effectively final&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Interestingly, you can get around this by using a method reference. I will show an example in the next section.&lt;/p&gt;
@@ -110,14 +110,14 @@ public class LambdaTest {
 
 &lt;p&gt;For example, you can write a lambda like this:&lt;/p&gt;
 
-
-        Comparator&lt;String&gt; comparator1 = (s1, s2) -&gt; s1.compareToIgnoreCase(s2);
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Comparator&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;comparator1&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s1&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;s2&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;s1&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;compareToIgnoreCase&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s2&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;And you can rewrite it using a method reference like this:&lt;/p&gt;
 
-
-        Comparator&lt;String&gt; comparator2 = String::compareToIgnoreCase;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Comparator&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;comparator2&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;compareToIgnoreCase&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;I was a bit surprised that it figured out Comparator&amp;rsquo;s compare(o1, o2) method maps to o1.compareToIgnoreCase(o2). Based on the spec, the first parameter will be used as the receiver of the method reference and the rest of the parameters will be passed as parameters to the method in the method reference.&lt;/p&gt;
@@ -126,26 +126,26 @@ public class LambdaTest {
 
 &lt;p&gt;Calling an instance method on an object has an interesting twist.&lt;/p&gt;
 
-
-        Set&lt;String&gt; items = Collections.singleton(&#34;OK&#34;);
-        Predicate&lt;String&gt; doesContain = items::contains;
-        items = Collections.singleton(&#34;NOT OK&#34;);
-        assertFalse(items.contains(&#34;OK&#34;));
-        assertTrue(doesContain.test(&#34;OK&#34;));
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Set&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;items&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;Collections&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;singleton&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;OK&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Predicate&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;doesContain&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;items&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;contains&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;items&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;Collections&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;singleton&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;NOT OK&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;assertFalse&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;items&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;contains&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;OK&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;));&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;assertTrue&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;doesContain&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;test&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;OK&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;The code above works. This surprised me. I was expecting a compilation error since I made a modification to items. But method reference must be doing something more complex than re-writing as a lambda behind the scene. Very likely, it stored &lt;code&gt;items&lt;/code&gt; object in another reference in the object that represented the method reference.&lt;/p&gt;
 
 &lt;p&gt;It probably looked similar to this:
-
-        Set&lt;String&gt; items = Collections.singleton(&#34;OK&#34;);
-        // start of method reference 
-        Set&lt;String&gt; reference = items;
-        Predicate&lt;String&gt; doesContain = (s) -&gt; reference.contains(s);
-        // end of method reference 
-        items = Collections.singleton(&#34;NOT OK&#34;);
-        assertFalse(items.contains(&#34;OK&#34;));
-        assertTrue(doesContain.test(&#34;OK&#34;));
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Set&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;items&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;Collections&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;singleton&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;OK&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// start of method reference &lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Set&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;reference&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;items&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;Predicate&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;String&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;doesContain&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;reference&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;contains&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;s&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;// end of method reference &lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;items&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;Collections&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;singleton&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;NOT OK&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;assertFalse&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;items&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;contains&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;OK&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;));&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;assertTrue&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;doesContain&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;test&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;OK&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 &lt;/p&gt;
 
 &lt;h3 id=&#34;closing&#34;&gt;Closing&lt;/h3&gt;
@@ -178,44 +178,44 @@ public class LambdaTest {
 
 &lt;p&gt;Let me go through the sections in the file.&lt;/p&gt;
 
-&lt;p&gt;
-  config.vm.box = &#34;puppet-labs-ubuntu-server-12042-x64-vbox4210-nocm.&#34;
-  config.vm.box_url = &#34;http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box&#34;
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;box&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;puppet-labs-ubuntu-server-12042-x64-vbox4210-nocm.&amp;quot;&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;box_url&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;http://puppet-vagrant-boxes.puppetlabs.com/ubuntu-server-12042-x64-vbox4210-nocm.box&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This pulls down the preconfigured base box from puppetlabs.com. This is the blank slate you start with. I used Ubuntu x64 12.04 LTS &lt;em&gt;aka&lt;/em&gt; Precise Pangolin. You can see more base boxes &lt;a href=&#34;http://puppet-vagrant-boxes.puppetlabs.com&#34;&gt;here&lt;/a&gt; and &lt;a href=&#34;http://www.vagrantbox.es&#34;&gt;here&lt;/a&gt;. I also picked the version without any CM software installed. I did this because the reasoning from the &lt;a href=&#34;http://blog.kloudless.com/2013/07/01/automating-development-environments-with-vagrant-and-puppet&#34;&gt;second article&lt;/a&gt; - if you install your own CM software, then you can easily keep it up to date without changing the base box frequently.&lt;/p&gt;
 
-&lt;p&gt;
-  config.vm.define :web do |web|
-    web.vm.hostname = &#34;dev-www.yellowaxe.vm&#34;
-    web.vm.network :private_network, ip: &#34;192.168.33.10&#34;
-    web.vm.network :forwarded_port, guest: 80, host: 9080
-    web.vm.network :forwarded_port, guest: 443, host: 7043
-  end
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;define&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:web&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;hostname&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;dev-www.yellowaxe.vm&amp;quot;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;network&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:private_network&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;ip&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;192.168.33.10&amp;quot;&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;network&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:forwarded_port&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;guest&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;80&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;host&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;9080&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;web&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;network&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:forwarded_port&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;guest&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;443&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;host&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;7043&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This section defines a VM and gives it a hostname, IP, and forward some ports. Pretty self-explanatory.&lt;/p&gt;
 
-&lt;p&gt;
-  config.vm.provider :virtualbox do |vb|
-    vb.customize [&#34;modifyvm&#34;, :id, &#34;--memory&#34;, &#34;1024&#34;]
-  end
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;provider&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:virtualbox&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vb&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;vb&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;customize&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;modifyvm&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:id&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;--memory&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;1024&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;]&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This section modifies the VM using VirtualBox specific tool. You can do a lot more here. Currently, I just have it increase the memory to 1GB.&lt;/p&gt;
 
-&lt;p&gt;
-  # Enable shell provisioning to bootstrap puppet
-  config.vm.provision :shell, :path =&gt; &#34;puppet-bootstrap.sh&#34;
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #75715e&#34;&gt;# Enable shell provisioning to bootstrap puppet&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;provision&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:shell&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:path&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;puppet-bootstrap.sh&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This defines the first provisioner for the VM. It takes care of installing the latest version of puppet. The script is essentially the same as the one used in the kloudless article. It looks like this: &lt;a href=&#34;{{site.url}}/media/puppet/puppet-bootstrap.sh.txt&#34;&gt;puppet-bootstrap.sh&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;
-  # Enable provisioning with Puppet stand alone.
-  config.vm.provision :puppet do |puppet|
-        puppet.manifests_path = &#34;puppet/manifests&#34;
-        puppet.manifest_file  = &#34;site.pp&#34;
-        puppet.module_path = &#34;puppet/modules&#34;
-        puppet.options = &#34;--verbose&#34;
-        #puppet.options = &#34;--debug --verbose&#34;
-  end
+&lt;p&gt;&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  &lt;span style=&#34;color: #75715e&#34;&gt;# Enable provisioning with Puppet stand alone.&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;config&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;vm&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;provision&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;:puppet&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;|&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;manifests_path&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;puppet/manifests&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;manifest_file&lt;/span&gt;  &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;site.pp&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;module_path&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;puppet/modules&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;puppet&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;options&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;--verbose&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #75715e&#34;&gt;#puppet.options = &amp;quot;--debug --verbose&amp;quot;&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 This defines the second provisioner - Puppet. This is the one that gets the work done.&lt;/p&gt;
 
@@ -946,12 +946,12 @@ mds      52 root   16r   DIR  45,10    16384    2 /Volumes/kyle/berunda/media
 
 &lt;p&gt;Syntax highlighting via Pygments&lt;/p&gt;
 
-
-#container {
-  float: left;
-  margin: 0 -240px 0 0;
-  width: 100%;
-}
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;#container&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;float&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;left;&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;margin&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;-240px&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;width&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;100%&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Non Pygments code example&lt;/p&gt;
@@ -965,8 +965,8 @@ mds      52 root   16r   DIR  45,10    16384    2 /Volumes/kyle/berunda/media
 
 &lt;p&gt;Make any link standout more when applying the &lt;code&gt;.btn&lt;/code&gt; class.&lt;/p&gt;
 
-
-&lt;a href=&#34;#&#34; class=&#34;btn btn-success&#34;&gt;Success Button&lt;/a&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;a&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;href&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;#&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;class&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;btn btn-success&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;Success Button&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;lt;/&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;a&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;div markdown=&#34;0&#34;&gt;&lt;a href=&#34;#&#34; class=&#34;btn&#34;&gt;Primary Button&lt;/a&gt;&lt;/div&gt;

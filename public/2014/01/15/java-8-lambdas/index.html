@@ -74,21 +74,21 @@
 
 <p>Lambda expression is a concise way to express an anonymous function. The existing way for Java to pass functions around is using an anonymous inner class. This can be pretty wordy.</p>
 
-
-        Callable<String> callable = new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                return "I am called";
-            }
-        };
-        callable.call();
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f8f8f2">Callable</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">callable</span> <span style="color: #f92672">=</span> <span style="color: #66d9ef">new</span> <span style="color: #f8f8f2">Callable</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;()</span> <span style="color: #f92672">{</span>
+            <span style="color: #a6e22e">@Override</span>
+            <span style="color: #66d9ef">public</span> <span style="color: #f8f8f2">String</span> <span style="color: #a6e22e">call</span><span style="color: #f92672">()</span> <span style="color: #66d9ef">throws</span> <span style="color: #f8f8f2">Exception</span> <span style="color: #f92672">{</span>
+                <span style="color: #66d9ef">return</span> <span style="color: #e6db74">&quot;I am called&quot;</span><span style="color: #f92672">;</span>
+            <span style="color: #f92672">}</span>
+        <span style="color: #f92672">};</span>
+        <span style="color: #f8f8f2">callable</span><span style="color: #f92672">.</span><span style="color: #a6e22e">call</span><span style="color: #f92672">();</span>
+</pre></div>
 
 
 <p>In Java 8, this becomes</p>
 
-
-        Callable<String> callable = () -> "I am called";
-        callable.call();
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f8f8f2">Callable</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">callable</span> <span style="color: #f92672">=</span> <span style="color: #f92672">()</span> <span style="color: #f92672">-&gt;</span> <span style="color: #e6db74">&quot;I am called&quot;</span><span style="color: #f92672">;</span>
+        <span style="color: #f8f8f2">callable</span><span style="color: #f92672">.</span><span style="color: #a6e22e">call</span><span style="color: #f92672">();</span>
+</pre></div>
 
 
 <p>Nice and short. On the right hand side, there is no need to specify you are implementing the <code>call()</code> method on <code>Callable</code>. The compiler figured that out by inferring the type (<code>Callable</code>) from the left hand side, which provides the context. There is no need to specify <code>call()</code> method because it only support interfaces with single public method. The new name for these types of interfaces is <em>functional interfaces</em>.</p>
@@ -97,61 +97,61 @@
 
 <p>When there is no left hand side and thus no context to infer the type from, a cast is needed to give the compiler a hint.</p>
 
-
-        ((Runnable) () -> {
-            System.out.println("Hi!");
-        }).run();
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f92672">((</span><span style="color: #f8f8f2">Runnable</span><span style="color: #f92672">)</span> <span style="color: #f92672">()</span> <span style="color: #f92672">-&gt;</span> <span style="color: #f92672">{</span>
+            <span style="color: #f8f8f2">System</span><span style="color: #f92672">.</span><span style="color: #a6e22e">out</span><span style="color: #f92672">.</span><span style="color: #a6e22e">println</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;Hi!&quot;</span><span style="color: #f92672">);</span>
+        <span style="color: #f92672">}).</span><span style="color: #a6e22e">run</span><span style="color: #f92672">();</span>
+</pre></div>
 
 
 <h4 id="method-parameters">Method Parameters</h4>
 
 <p>When the implementable method has parameters, they typically don&rsquo;t need to be provided either. The compiler will determine them from the interface method declaration.</p>
 
-
-        Comparator<String> comparator = (s1, s2) -> s1.compareToIgnoreCase(s2);
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f8f8f2">Comparator</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">comparator</span> <span style="color: #f92672">=</span> <span style="color: #f92672">(</span><span style="color: #f8f8f2">s1</span><span style="color: #f92672">,</span> <span style="color: #f8f8f2">s2</span><span style="color: #f92672">)</span> <span style="color: #f92672">-&gt;</span> <span style="color: #f8f8f2">s1</span><span style="color: #f92672">.</span><span style="color: #a6e22e">compareToIgnoreCase</span><span style="color: #f92672">(</span><span style="color: #f8f8f2">s2</span><span style="color: #f92672">);</span>
+</pre></div>
 
 
 <h4 id="where-is-this-pointing-to">Where is this pointing to?</h4>
 
 <p><code>this</code> is a bit tricky inside lambdas. The <code>this</code> object basically references the enclosing instance. This is different from anonymous inner classes, but it makes perfect sense when you see it.</p>
 
-
-public class LambdaTest {
-    @Test
-    public void simple_lambda() throws Exception {
-        // in lambda,
-        // scoping causes "this" to point to the instance of LambdaTest instead of the lambda expression itself
-        ((Runnable) () -> {
-            assertEquals("LambdaTest", this.toString());
-        }).run();
-        // in anonymous inner class, this is different
-        // practically, this makes sense, as I can make actual use of "this" in an anon-inner class
-        (new Runnable() {
-            @Override
-            public void run() {
-                assertEquals("Inner", this.toString());
-            }
-            @Override
-            public String toString() {
-                return "Inner";
-            }
-        }).run();
-    }
-    @Override
-    public String toString() {
-        return LambdaTest.class.getSimpleName();
-    }
-}
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #66d9ef">public</span> <span style="color: #66d9ef">class</span> <span style="color: #a6e22e">LambdaTest</span> <span style="color: #f92672">{</span>
+    <span style="color: #a6e22e">@Test</span>
+    <span style="color: #66d9ef">public</span> <span style="color: #66d9ef">void</span> <span style="color: #a6e22e">simple_lambda</span><span style="color: #f92672">()</span> <span style="color: #66d9ef">throws</span> <span style="color: #f8f8f2">Exception</span> <span style="color: #f92672">{</span>
+        <span style="color: #75715e">// in lambda,</span>
+        <span style="color: #75715e">// scoping causes &quot;this&quot; to point to the instance of LambdaTest instead of the lambda expression itself</span>
+        <span style="color: #f92672">((</span><span style="color: #f8f8f2">Runnable</span><span style="color: #f92672">)</span> <span style="color: #f92672">()</span> <span style="color: #f92672">-&gt;</span> <span style="color: #f92672">{</span>
+            <span style="color: #f8f8f2">assertEquals</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;LambdaTest&quot;</span><span style="color: #f92672">,</span> <span style="color: #66d9ef">this</span><span style="color: #f92672">.</span><span style="color: #a6e22e">toString</span><span style="color: #f92672">());</span>
+        <span style="color: #f92672">}).</span><span style="color: #a6e22e">run</span><span style="color: #f92672">();</span>
+        <span style="color: #75715e">// in anonymous inner class, this is different</span>
+        <span style="color: #75715e">// practically, this makes sense, as I can make actual use of &quot;this&quot; in an anon-inner class</span>
+        <span style="color: #f92672">(</span><span style="color: #66d9ef">new</span> <span style="color: #f8f8f2">Runnable</span><span style="color: #f92672">()</span> <span style="color: #f92672">{</span>
+            <span style="color: #a6e22e">@Override</span>
+            <span style="color: #66d9ef">public</span> <span style="color: #66d9ef">void</span> <span style="color: #a6e22e">run</span><span style="color: #f92672">()</span> <span style="color: #f92672">{</span>
+                <span style="color: #f8f8f2">assertEquals</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;Inner&quot;</span><span style="color: #f92672">,</span> <span style="color: #66d9ef">this</span><span style="color: #f92672">.</span><span style="color: #a6e22e">toString</span><span style="color: #f92672">());</span>
+            <span style="color: #f92672">}</span>
+            <span style="color: #a6e22e">@Override</span>
+            <span style="color: #66d9ef">public</span> <span style="color: #f8f8f2">String</span> <span style="color: #a6e22e">toString</span><span style="color: #f92672">()</span> <span style="color: #f92672">{</span>
+                <span style="color: #66d9ef">return</span> <span style="color: #e6db74">&quot;Inner&quot;</span><span style="color: #f92672">;</span>
+            <span style="color: #f92672">}</span>
+        <span style="color: #f92672">}).</span><span style="color: #a6e22e">run</span><span style="color: #f92672">();</span>
+    <span style="color: #f92672">}</span>
+    <span style="color: #a6e22e">@Override</span>
+    <span style="color: #66d9ef">public</span> <span style="color: #f8f8f2">String</span> <span style="color: #a6e22e">toString</span><span style="color: #f92672">()</span> <span style="color: #f92672">{</span>
+        <span style="color: #66d9ef">return</span> <span style="color: #f8f8f2">LambdaTest</span><span style="color: #f92672">.</span><span style="color: #a6e22e">class</span><span style="color: #f92672">.</span><span style="color: #a6e22e">getSimpleName</span><span style="color: #f92672">();</span>
+    <span style="color: #f92672">}</span>
+<span style="color: #f92672">}</span>
+</pre></div>
 
 
 <h4 id="variable-capture">Variable capture</h4>
 
 <p>Just like anonymous inner class, using variable from outside the lambda has restrictions. The compiler is smart enough to know if you are changing the capture variable.</p>
 
-
-        int size = 100;
-        ((Runnable) () -> System.out.println(size)).run();
-        //size++; //this causes a compilation error when uncommented - size needs to be effectively final
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #66d9ef">int</span> <span style="color: #f8f8f2">size</span> <span style="color: #f92672">=</span> <span style="color: #ae81ff">100</span><span style="color: #f92672">;</span>
+        <span style="color: #f92672">((</span><span style="color: #f8f8f2">Runnable</span><span style="color: #f92672">)</span> <span style="color: #f92672">()</span> <span style="color: #f92672">-&gt;</span> <span style="color: #f8f8f2">System</span><span style="color: #f92672">.</span><span style="color: #a6e22e">out</span><span style="color: #f92672">.</span><span style="color: #a6e22e">println</span><span style="color: #f92672">(</span><span style="color: #f8f8f2">size</span><span style="color: #f92672">)).</span><span style="color: #a6e22e">run</span><span style="color: #f92672">();</span>
+        <span style="color: #75715e">//size++; //this causes a compilation error when uncommented - size needs to be effectively final</span>
+</pre></div>
 
 
 <p>Interestingly, you can get around this by using a method reference. I will show an example in the next section.</p>
@@ -162,14 +162,14 @@ public class LambdaTest {
 
 <p>For example, you can write a lambda like this:</p>
 
-
-        Comparator<String> comparator1 = (s1, s2) -> s1.compareToIgnoreCase(s2);
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f8f8f2">Comparator</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">comparator1</span> <span style="color: #f92672">=</span> <span style="color: #f92672">(</span><span style="color: #f8f8f2">s1</span><span style="color: #f92672">,</span> <span style="color: #f8f8f2">s2</span><span style="color: #f92672">)</span> <span style="color: #f92672">-&gt;</span> <span style="color: #f8f8f2">s1</span><span style="color: #f92672">.</span><span style="color: #a6e22e">compareToIgnoreCase</span><span style="color: #f92672">(</span><span style="color: #f8f8f2">s2</span><span style="color: #f92672">);</span>
+</pre></div>
 
 
 <p>And you can rewrite it using a method reference like this:</p>
 
-
-        Comparator<String> comparator2 = String::compareToIgnoreCase;
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f8f8f2">Comparator</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">comparator2</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">String</span><span style="color: #f92672">::</span><span style="color: #f8f8f2">compareToIgnoreCase</span><span style="color: #f92672">;</span>
+</pre></div>
 
 
 <p>I was a bit surprised that it figured out Comparator&rsquo;s compare(o1, o2) method maps to o1.compareToIgnoreCase(o2). Based on the spec, the first parameter will be used as the receiver of the method reference and the rest of the parameters will be passed as parameters to the method in the method reference.</p>
@@ -178,26 +178,26 @@ public class LambdaTest {
 
 <p>Calling an instance method on an object has an interesting twist.</p>
 
-
-        Set<String> items = Collections.singleton("OK");
-        Predicate<String> doesContain = items::contains;
-        items = Collections.singleton("NOT OK");
-        assertFalse(items.contains("OK"));
-        assertTrue(doesContain.test("OK"));
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f8f8f2">Set</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">items</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Collections</span><span style="color: #f92672">.</span><span style="color: #a6e22e">singleton</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;OK&quot;</span><span style="color: #f92672">);</span>
+        <span style="color: #f8f8f2">Predicate</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">doesContain</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">items</span><span style="color: #f92672">::</span><span style="color: #f8f8f2">contains</span><span style="color: #f92672">;</span>
+        <span style="color: #f8f8f2">items</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Collections</span><span style="color: #f92672">.</span><span style="color: #a6e22e">singleton</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;NOT OK&quot;</span><span style="color: #f92672">);</span>
+        <span style="color: #f8f8f2">assertFalse</span><span style="color: #f92672">(</span><span style="color: #f8f8f2">items</span><span style="color: #f92672">.</span><span style="color: #a6e22e">contains</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;OK&quot;</span><span style="color: #f92672">));</span>
+        <span style="color: #f8f8f2">assertTrue</span><span style="color: #f92672">(</span><span style="color: #f8f8f2">doesContain</span><span style="color: #f92672">.</span><span style="color: #a6e22e">test</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;OK&quot;</span><span style="color: #f92672">));</span>
+</pre></div>
 
 
 <p>The code above works. This surprised me. I was expecting a compilation error since I made a modification to items. But method reference must be doing something more complex than re-writing as a lambda behind the scene. Very likely, it stored <code>items</code> object in another reference in the object that represented the method reference.</p>
 
 <p>It probably looked similar to this:
-
-        Set<String> items = Collections.singleton("OK");
-        // start of method reference 
-        Set<String> reference = items;
-        Predicate<String> doesContain = (s) -> reference.contains(s);
-        // end of method reference 
-        items = Collections.singleton("NOT OK");
-        assertFalse(items.contains("OK"));
-        assertTrue(doesContain.test("OK"));
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>        <span style="color: #f8f8f2">Set</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">items</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Collections</span><span style="color: #f92672">.</span><span style="color: #a6e22e">singleton</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;OK&quot;</span><span style="color: #f92672">);</span>
+        <span style="color: #75715e">// start of method reference </span>
+        <span style="color: #f8f8f2">Set</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">reference</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">items</span><span style="color: #f92672">;</span>
+        <span style="color: #f8f8f2">Predicate</span><span style="color: #f92672">&lt;</span><span style="color: #f8f8f2">String</span><span style="color: #f92672">&gt;</span> <span style="color: #f8f8f2">doesContain</span> <span style="color: #f92672">=</span> <span style="color: #f92672">(</span><span style="color: #f8f8f2">s</span><span style="color: #f92672">)</span> <span style="color: #f92672">-&gt;</span> <span style="color: #f8f8f2">reference</span><span style="color: #f92672">.</span><span style="color: #a6e22e">contains</span><span style="color: #f92672">(</span><span style="color: #f8f8f2">s</span><span style="color: #f92672">);</span>
+        <span style="color: #75715e">// end of method reference </span>
+        <span style="color: #f8f8f2">items</span> <span style="color: #f92672">=</span> <span style="color: #f8f8f2">Collections</span><span style="color: #f92672">.</span><span style="color: #a6e22e">singleton</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;NOT OK&quot;</span><span style="color: #f92672">);</span>
+        <span style="color: #f8f8f2">assertFalse</span><span style="color: #f92672">(</span><span style="color: #f8f8f2">items</span><span style="color: #f92672">.</span><span style="color: #a6e22e">contains</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;OK&quot;</span><span style="color: #f92672">));</span>
+        <span style="color: #f8f8f2">assertTrue</span><span style="color: #f92672">(</span><span style="color: #f8f8f2">doesContain</span><span style="color: #f92672">.</span><span style="color: #a6e22e">test</span><span style="color: #f92672">(</span><span style="color: #e6db74">&quot;OK&quot;</span><span style="color: #f92672">));</span>
+</pre></div>
 </p>
 
 <h3 id="closing">Closing</h3>
